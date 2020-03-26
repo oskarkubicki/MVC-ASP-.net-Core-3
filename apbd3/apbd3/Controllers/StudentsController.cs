@@ -52,5 +52,36 @@ namespace apbd3.Controllers
             student.IndexNumber = $"s{new Random().Next(1, 20000)}";
             return Ok(student);
         }
+
+
+
+       [HttpPut]
+
+
+       public IActionResult putStudent(Student student) 
+        
+        
+        {
+
+
+            student.IndexNumber = $"s{new Random().Next(1, 20000)}";
+            return Ok("Update complete");
+        }
+
+
+
+        [HttpDelete]
+
+
+        public IActionResult deleteStudent(Student student)
+
+
+        {
+
+
+           
+            return Ok("Delete complete");
+        }
+
     }
 }
