@@ -18,7 +18,9 @@ namespace apbd3.DAL
             _students = new List<Student> { 
             
             new Student{IdStudent=1,Firstname="Jan",Lastname="Kowalski"},
-            
+            new Student{IdStudent=2,Firstname="Maciej",Lastname="Stryczynski"},
+            new Student{IdStudent=3,Firstname="Kazimierz",Lastname="Czeszynski"}
+
             };
         }
         public IEnumerable<Student> GetStudents()

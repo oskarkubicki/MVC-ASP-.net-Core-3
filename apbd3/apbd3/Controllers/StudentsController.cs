@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using apbd3.DAL;
 using apbd3.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,10 +15,21 @@ namespace apbd3.Controllers
     [Route("api/students")]
 
     public class StudentsController : ControllerBase
-    {[HttpGet]
-        public string GetStudents(string orderBy)
+    {
+        private readonly IDbService _dbservice;
+
+
+        public StudentsController(IDbService dbService)
+        
         {
-            return $"Kowalski,Malewski,Andrzejewski sorted by={orderBy}";
+
+            _dbservice = dbService;
+        }
+        
+        [HttpGet]
+        public IActionResult GetStudents(string orderBy)
+        {
+            return Ok(_dbservice.GetStudents());
         }
 
 
