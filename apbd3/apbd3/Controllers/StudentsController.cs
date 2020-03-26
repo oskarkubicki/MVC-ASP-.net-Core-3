@@ -12,9 +12,9 @@ namespace apbd3.Controllers
 
     [ApiController]
     [Route("api/students")]
- 
+
     public class StudentsController : ControllerBase
-    {   [HttpGet]
+    {[HttpGet]
         public string GetStudents(string orderBy)
         {
             return $"Kowalski,Malewski,Andrzejewski sorted by={orderBy}";
@@ -47,7 +47,7 @@ namespace apbd3.Controllers
         [HttpPost]
 
 
-        public IActionResult createStudent (Student student)
+        public IActionResult createStudent(Student student)
         {
             student.IndexNumber = $"s{new Random().Next(1, 20000)}";
             return Ok(student);
@@ -55,25 +55,26 @@ namespace apbd3.Controllers
 
 
 
-       [HttpPut]
+        [HttpPut("{Id}")]
 
 
-       public IActionResult putStudent(Student student) 
-        
-        
+        public IActionResult putStudent(int Id)
+
+
         {
 
-
+            Student student = new Student();
+            student.IdStudent = Id;
             student.IndexNumber = $"s{new Random().Next(1, 20000)}";
             return Ok("Update complete");
         }
 
 
 
-        [HttpDelete]
+        [HttpDelete("{Id}")]
 
 
-        public IActionResult deleteStudent(Student student)
+        public IActionResult deleteStudent(int Id)
 
 
         {
