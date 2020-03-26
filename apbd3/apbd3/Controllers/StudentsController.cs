@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using apbd3.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace apbd3.Controllers
@@ -40,6 +41,16 @@ namespace apbd3.Controllers
 
                 return NotFound("The element was not found");
             }
+        }
+
+
+        [HttpPost]
+
+
+        public IActionResult createStudent (Student student)
+        {
+            student.IndexNumber = $"s{new Random().Next(1, 20000)}";
+            return Ok(student);
         }
     }
 }
