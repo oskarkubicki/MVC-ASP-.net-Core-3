@@ -11,11 +11,12 @@ namespace apbd3.Controllers
 
     [ApiController]
     [Route("api/students")]
+ 
     public class StudentsController : ControllerBase
-    {
-        public string GetStudent()
+    {   [HttpGet]
+        public string GetStudents(string orderBy)
         {
-            return "Kowalski,Malewski,Andrzejewski";
+            return $"Kowalski,Malewski,Andrzejewski sorted by={orderBy}";
         }
 
 
