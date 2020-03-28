@@ -32,7 +32,7 @@ namespace apbd3.Controllers
         public IActionResult GetStudents()
         {
 
-            using (var client = new SqlConnection("[Data Source=db-mssql;Initial Catalog=s19732;Integrated Security=True]"))
+            using (var client = new SqlConnection("[Data Source=db-mssql;Initial Catalog=s19732;Integrated Security=True]"))  { }
             return Ok(_dbservice.GetStudents());
         }
 
