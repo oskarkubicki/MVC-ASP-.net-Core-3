@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using apbd3.DAL;
 using apbd3.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
+using System.Data.SqlClient;
 
 namespace apbd3.Controllers
 
@@ -27,8 +29,10 @@ namespace apbd3.Controllers
         }
         
         [HttpGet]
-        public IActionResult GetStudents(string orderBy)
+        public IActionResult GetStudents()
         {
+
+            using (var client = new SqlConnection("[Data Source=db-mssql;Initial Catalog=s19732;Integrated Security=True]"))
             return Ok(_dbservice.GetStudents());
         }
 
