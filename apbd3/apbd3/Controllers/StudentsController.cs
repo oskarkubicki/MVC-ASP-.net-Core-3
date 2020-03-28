@@ -73,8 +73,8 @@ namespace apbd3.Controllers
         }
 
 
-        [HttpGet("{id}")]
-        public IActionResult GetStudent(int id)
+        [HttpGet("{index}")]
+        public IActionResult GetStudent(string index)
         {
 
             using (var client = new SqlConnection("Data Source=db-mssql.pjwstk.edu.pl;Initial Catalog=2019SBD;Integrated Security=True"))
@@ -83,8 +83,9 @@ namespace apbd3.Controllers
             {
 
                 com.Connection = client;
-                com.CommandText = "select Enrollment.IdEnrollment,Enrollment.Semester,Enrollment.IdStudy,Enrollment.StartDate from Enrollment,Student where Student.IdEnrollment=Enrollment.IdEnrollment and Student.IndexNumber='s" + id+"'";
 
+                com.CommandText = "select Enrollment.IdEnrollment,Enrollment.Semester,Enrollment.IdStudy,Enrollment.StartDate from Enrollment,Student where Student.IdEnrollment=Enrollment.IdEnrollment and Student.IndexNumber=@index";
+                com.Parameters.AddWithValue("index", index);
                 client.Open();
                 var dr = com.ExecuteReader();
 
@@ -97,13 +98,13 @@ namespace apbd3.Controllers
 
                     var st = new Enrollment();
 
-                    
+
 
                     st.Idenrollment = Convert.ToInt32(dr["IdEnrollment"]);
                     st.semester = dr["Semester"].ToString();
                     st.IdStudy = Convert.ToInt32(dr["IdStudy"]);
                     st.StartDate = dr["StartDate"].ToString();
-                   
+
 
 
                     lista2.Add(st);
