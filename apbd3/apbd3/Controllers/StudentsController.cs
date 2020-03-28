@@ -20,6 +20,8 @@ namespace apbd3.Controllers
     {
         private readonly IDbService _dbservice;
 
+        List<Student> lista;
+
 
         public StudentsController(IDbService dbService)
         
@@ -32,8 +34,41 @@ namespace apbd3.Controllers
         public IActionResult GetStudents()
         {
 
-            using (var client = new SqlConnection("[Data Source=db-mssql;Initial Catalog=s19732;Integrated Security=True]"))  { }
-            return Ok(_dbservice.GetStudents());
+            using (var client = new SqlConnection("Data Source=db-mssql.pjwstk.edu.pl;Initial Catalog=2019SBD;Integrated Security=True")) 
+                using(var com =new SqlCommand())
+            
+            {
+
+                com.Connection = client;
+                com.CommandText = "select FirstName,LastName,BirthDate,Name,Semester from Student,Studies,Enrollment where Student.IdEnrollment=Enrollment.IdEnrollment and Enrollment.IdStudy=Studies.IdStudy";
+
+                client.Open();
+                var dr = com.ExecuteReader();
+
+
+                lista = new List<Student>();
+
+
+                while (dr.Read())
+                {
+
+                    var st = new Student();
+
+                    st.Firstname = dr["FirstName"].ToString();
+                    st.Lastname = dr["LastName"].ToString();
+                    st.BirthDate = dr["BirthDate"].ToString();
+                    st.Studies = dr["Name"].ToString();
+                    st.Semester = dr["Semester"].ToString();
+
+
+                    lista.Add(st);
+
+
+
+                }
+
+            }
+            return Ok(lista);
         }
 
 

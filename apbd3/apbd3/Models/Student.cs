@@ -15,6 +15,13 @@ namespace apbd3.Models
 
         public string Lastname { get; set; }
 
+
+        public string BirthDate { get; set; }
+
+        public string Studies { get; set; }
+
+        public string Semester { get; set; }
+
         public string IndexNumber { get; set; }
     }
 }
