@@ -21,6 +21,7 @@ namespace apbd3.Controllers
         private readonly IDbService _dbservice;
 
         List<Student> lista;
+        List<Enrollment> lista2;
 
 
         public StudentsController(IDbService dbService)
@@ -76,22 +77,43 @@ namespace apbd3.Controllers
         public IActionResult GetStudent(int id)
         {
 
-            if (id == 1)
+            using (var client = new SqlConnection("Data Source=db-mssql.pjwstk.edu.pl;Initial Catalog=2019SBD;Integrated Security=True"))
+            using (var com = new SqlCommand())
+
             {
 
-                return Ok("Kowalski");
+                com.Connection = client;
+                com.CommandText = "select Enrollment.IdEnrollment,Enrollment.Semester,Enrollment.IdStudy,Enrollment.StartDate from Enrollment,Student where Student.IdEnrollment=Enrollment.IdEnrollment and Student.IndexNumber='s" + id+"'";
+
+                client.Open();
+                var dr = com.ExecuteReader();
+
+
+                lista2 = new List<Enrollment>();
+
+
+                while (dr.Read())
+                {
+
+                    var st = new Enrollment();
+
+                    
+
+                    st.Idenrollment = Convert.ToInt32(dr["IdEnrollment"]);
+                    st.semester = dr["Semester"].ToString();
+                    st.IdStudy = Convert.ToInt32(dr["IdStudy"]);
+                    st.StartDate = dr["StartDate"].ToString();
+                   
+
+
+                    lista2.Add(st);
+
+
+
+                }
 
             }
-            else if (id == 2)
-            {
-
-                return Ok("Malewski");
-
-            }
-            else {
-
-                return NotFound("The element was not found");
-            }
+            return Ok(lista2);
         }
 
 
