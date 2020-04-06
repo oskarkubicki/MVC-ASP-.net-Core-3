@@ -10,7 +10,6 @@ using System.Data.SqlClient;
 
 namespace apbd3.Controllers
 
-
 {
 
     [ApiController]
@@ -54,7 +53,6 @@ namespace apbd3.Controllers
                 {
 
                     var st = new Student();
-
                     st.Firstname = dr["FirstName"].ToString();
                     st.Lastname = dr["LastName"].ToString();
                     st.BirthDate = dr["BirthDate"].ToString();
@@ -63,8 +61,6 @@ namespace apbd3.Controllers
 
 
                     lista.Add(st);
-
-
 
                 }
 
@@ -95,22 +91,14 @@ namespace apbd3.Controllers
 
                 while (dr.Read())
                 {
-
                     var st = new Enrollment();
-
-
 
                     st.Idenrollment = Convert.ToInt32(dr["IdEnrollment"]);
                     st.semester = dr["Semester"].ToString();
                     st.IdStudy = Convert.ToInt32(dr["IdStudy"]);
                     st.StartDate = dr["StartDate"].ToString();
 
-
-
                     lista2.Add(st);
-
-
-
                 }
 
             }
@@ -150,11 +138,8 @@ namespace apbd3.Controllers
 
         public IActionResult deleteStudent(int Id)
 
-
         {
 
-
-           
             return Ok("Delete complete");
         }
 
