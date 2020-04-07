@@ -14,7 +14,6 @@ namespace apbd3.Controllers
     public class EnrollmentsController : ControllerBase
     {
 
-
         [HttpPost]
         public IActionResult AddStudent(Student student)
         {
@@ -30,7 +29,6 @@ namespace apbd3.Controllers
                     return BadRequest("error missing information");
                 }
                 else
-
                 {
 
                     int idEnrollment;
@@ -50,16 +48,10 @@ namespace apbd3.Controllers
                     if (!dr.Read())
                     {
                         tran.Rollback();
-
                     }
 
-
                     int idStudies = (int)dr["IdStudy"];
-
-
                     dr.Close();
-
-
                     com.CommandText = "SELECT * FROM Enrollment WHERE Semester=1 AND IdStudy=@IdStud";
 
                     com.Parameters.AddWithValue("IdStud", idStudies);
@@ -80,8 +72,10 @@ namespace apbd3.Controllers
                         dr3.Read();
 
                          idEnrollment = dr3.GetInt32(0);
+                        
+                        dr3.Close();
 
-                        com.CommandText = "INSERT INTO Enrollment(idEnrollment, semester, idStudy,StartDate) VALUES (@idE, @Semester,@IdStudy,@sd";
+                        com.CommandText = "INSERT INTO Enrollment(idEnrollment, semester, idStudy,StartDate) VALUES (@idE, @Semester,@IdStudy,@sd)";
 
 
                         com.Parameters.AddWithValue("idE", idEnrollment + 1);
@@ -90,8 +84,12 @@ namespace apbd3.Controllers
                         com.Parameters.AddWithValue("sd", DateTime.Now.ToString());
 
 
-                        dr3.Close();
+                        var dr6 = com.ExecuteNonQuery();
 
+                       
+
+
+                      
                     }
                     else
                     {
@@ -99,9 +97,26 @@ namespace apbd3.Controllers
                         idEnrollment = (int) dr2["IdEnrollment"];
 
                     }
-               
-                  
 
+
+                    com.CommandText = "SELECT * FROM Student WHERE IndexNumber =@indexs";
+
+                    com.Parameters.AddWithValue("indexs", student.IndexNumber);
+
+                    var dr5 = com.ExecuteReader();
+
+                     if (dr5.Read()){
+
+
+                        tran.Rollback();
+
+                        return BadRequest("student with indexnumber already exists");
+
+                    }
+
+                    dr5.Close();
+
+                    com.Parameters.AddWithValue("IdStuds", idStudies);
 
                     com.CommandText = "INSERT INTO Student(IndexNumber, FirstName, LastName,Birthdate,IdEnrollment) VALUES (@Indexn,@FirstName, @LastName,@Birthdate,@Studies)";
                     //...
@@ -111,14 +126,12 @@ namespace apbd3.Controllers
                     com.Parameters.AddWithValue("Birthdate", DateTime.Parse(student.BirthDate));
                     com.Parameters.AddWithValue("Studies",idEnrollment );
 
-
                     //...
                     com.ExecuteNonQuery();
 
-                    tran.Commit(); //make all the changes in db visible to another users
+                    
+                    com.CommandText = "Select * from enrollment where idstudy=@iDstuds and semester=1 and StartDate=(select max(StartDate) from Enrollment where IdStudy=@IdStuds)";
 
-
-                    com.CommandText = "Select * from enrollment where idstudy=@idstudies and semester=1 and max(startdate)";
 
                     var dr4 = com.ExecuteReader();
 
@@ -127,12 +140,15 @@ namespace apbd3.Controllers
                     while (dr4.Read())
                     {
                         enrollment.Idenrollment = (int)dr4["idEnrollment"];
-                        enrollment.semester = (string)dr4["Semester"];
+                        enrollment.semester = (int)dr4["Semester"];
                         enrollment.IdStudy = (int)dr4["IdStudy"];
-                        enrollment.StartDate = (string)dr4["idEnrollment"];
+                         var StartDate =dr4["StartDate"];
+                        enrollment.StartDate = StartDate.ToString();
 
                     }
 
+                    dr4.Close();
+                    tran.Commit(); 
                     return new ObjectResult(enrollment) { StatusCode = StatusCodes.Status201Created };
                 }
 

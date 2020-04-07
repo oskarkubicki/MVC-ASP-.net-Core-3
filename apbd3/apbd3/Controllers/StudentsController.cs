@@ -94,7 +94,7 @@ namespace apbd3.Controllers
                     var st = new Enrollment();
 
                     st.Idenrollment = Convert.ToInt32(dr["IdEnrollment"]);
-                    st.semester = dr["Semester"].ToString();
+                    st.semester =  (int) dr["Semester"];
                     st.IdStudy = Convert.ToInt32(dr["IdStudy"]);
                     st.StartDate = dr["StartDate"].ToString();
 

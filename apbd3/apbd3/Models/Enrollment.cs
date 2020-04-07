@@ -10,7 +10,7 @@ namespace apbd3.Models
 
         public int Idenrollment { get; set; }
 
-        public string semester { get; set; }
+        public int semester { get; set; }
 
         public int IdStudy { get; set; }
 
