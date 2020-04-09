@@ -11,10 +11,17 @@ namespace apbd3.DTO
 
         private Enrollment enrollment;
 
-       public  PromoteResponse(Enrollment enrollment) {
+        public string Studies { get; set; }
+
+        public int Semester { get; set; }
 
 
-            this.enrollment = enrollment;
+        public PromoteResponse(Enrollment enrollment) {
+
+
+            Studies = enrollment.StartDate;
+
+            Semester = enrollment.semester;
         }
     }
 }

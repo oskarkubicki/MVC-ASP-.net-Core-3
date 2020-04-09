@@ -64,15 +64,13 @@ namespace apbd3.Controllers
 
             else
             {
-
                 return BadRequest("not found");
             }
-                
 
 
             }
         }
-    }
 }
+
 
 

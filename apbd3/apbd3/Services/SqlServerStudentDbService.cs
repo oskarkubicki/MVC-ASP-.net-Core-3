@@ -68,6 +68,8 @@ namespace apbd3.Services
 
                         var dr6 = com.ExecuteNonQuery();
 
+                        
+
                     }
                     else
                     {
@@ -75,12 +77,19 @@ namespace apbd3.Services
                         idEnrollment = (int)dr2["IdEnrollment"];
                     }
 
+                    dr2.Close();
+
+                    
+
                     com.CommandText = "SELECT * FROM Student WHERE IndexNumber =@indexs";
                     com.Parameters.AddWithValue("indexs", student.IndexNumber);
                     var dr5 = com.ExecuteReader();
 
                     if (dr5.Read())
                     {
+
+
+                        dr5.Close();
 
                         tran.Rollback();
 
