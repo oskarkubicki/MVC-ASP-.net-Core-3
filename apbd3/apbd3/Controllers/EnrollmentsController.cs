@@ -113,7 +113,7 @@ namespace apbd3.Controllers
                     
                     com.CommandText = "Select * from enrollment where idstudy=@iDstuds and semester=1 and StartDate=(select max(StartDate) from Enrollment where IdStudy=@IdStuds)";
 
-
+ tran.Commit(); 
                     var dr4 = com.ExecuteReader();
 
 
@@ -129,7 +129,7 @@ namespace apbd3.Controllers
                     }
 
                     dr4.Close();
-                    tran.Commit(); 
+                   
                     return new ObjectResult(enrollment) { StatusCode = StatusCodes.Status201Created };
                 }
 
@@ -165,9 +165,6 @@ namespace apbd3.Controllers
                 dr.Close();
 
                 com.CommandType = System.Data.CommandType.StoredProcedure;
-
-
-
 
                 com.CommandText = "Promotion";
                 com.ExecuteNonQuery();
