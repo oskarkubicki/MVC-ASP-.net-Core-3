@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace apbd3.Services
 {
-    interface IStudentsDbService
+    public interface IStudentsDbService
     {
-        void EnrollStudent(Student student);
+        public EnrollmentResponse EnrollStudent(Student student);
 
-        void PromoteStudents(PromoteRequest request);
+        public PromoteResponse PromoteStudents(PromoteRequest request);
     }
 }
