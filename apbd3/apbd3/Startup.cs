@@ -28,12 +28,13 @@ namespace apbd3
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+          
+
             services.AddTransient<IStudentsDbService, SqlServerStudentDbService>();
             services.AddControllers();
             services.AddSingleton<IDbService, MockDbService>();
-            services.AddSwaggerGen(c => {
+             services.AddSwaggerGen(c => {
             c.SwaggerDoc("v1", new OpenApiInfo { Title="Student API",Version="v1" });
-            
             });
 
 
@@ -47,27 +48,25 @@ namespace apbd3
                 app.UseDeveloperExceptionPage();
             }
 
-
             app.UseSwagger();
+
             app.UseSwaggerUI(c => {
 
-
-                c.SwaggerEndpoint("swagger/v1/swagger.json","Student API V1");
-            
+                c.SwaggerEndpoint("/swagger/v1/swagger.json","Student API V1");
             });
 
-            app.Use(async (context, next) =>
+            app.UseWhen(context => context.Request.Path.ToString().Contains("secret"), app => app.Use(async (context, next) =>
             {
-                if (!context.Request.Headers.ContainsKey("Index")) {
-
+                if (!context.Request.Headers.ContainsKey("Index"))
+                {
                     context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                     await context.Response.WriteAsync("Index number required");
                     return;
-
                 }
 
                 string index = context.Request.Headers["Index"].ToString();
-
+                //stateless
+                //check in db if this index exists
                 var st = service.GetStudentByIndexAsync(index);
                 if (st == null)
                 {
@@ -76,14 +75,13 @@ namespace apbd3
                     return;
                 }
 
-
-                await next();
-            });
+                await next(); //calls the next middleware
+            }));
 
 
             app.UseRouting();
 
-            app.UseAuthorization();
+           // app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
