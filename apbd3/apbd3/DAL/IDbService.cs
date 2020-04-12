@@ -9,7 +9,6 @@ namespace apbd3.DAL
     public interface IDbService
     {
 
-
         public IEnumerable<Student> GetStudents();
     }
 }

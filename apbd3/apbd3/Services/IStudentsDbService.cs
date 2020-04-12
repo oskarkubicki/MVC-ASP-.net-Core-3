@@ -12,5 +12,11 @@ namespace apbd3.Services
         public EnrollmentResponse EnrollStudent(Student student);
 
         public PromoteResponse PromoteStudents(PromoteRequest request);
+
+        public Student GetStudentByIndexAsync(string index);
+
+
+        public void SaveLogData(string data);
+    
     }
 }

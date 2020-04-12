@@ -140,6 +140,49 @@ namespace apbd3.Services
             }
         }
 
+        public async Task<Student> GetStudentByIndexAsync(string index)
+        {
+
+            using (var client = new SqlConnection("Data Source=db-mssql.pjwstk.edu.pl;Initial Catalog=2019SBD;Integrated Security=True"))
+            using (var com = new SqlCommand()) 
+            {
+
+                com.CommandText="Select * from student where IndexNumber=@index ";
+ com.Parameters.AddWithValue("index", index);
+
+
+
+                using (var reader = await com.ExecuteReaderAsync()) { 
+
+
+
+                    if(await reader.ReadAsync())
+                    {
+
+                        
+
+                        var student = new Student();
+
+                        student.BirthDate = reader["Birthdate"].ToString();
+                        student.Firstname = reader["FirstName"].ToString();
+                        student.Lastname = reader["LastName"].ToString();
+                        student.IdStudent = (int) reader["IdEnrollment"];
+
+
+                        return student;
+
+
+                    }
+                    else
+                    {
+
+                        return null;
+
+                    }
+                }
+            }
+        }
+
         public PromoteResponse PromoteStudents(PromoteRequest request)
         {
 
@@ -194,6 +237,11 @@ namespace apbd3.Services
 
                 return promotion;
             }
+        }
+
+        public void SaveLogData(string data)
+        {
+            throw new NotImplementedException();
         }
     }
 } 
