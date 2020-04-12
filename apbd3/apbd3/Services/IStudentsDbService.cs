@@ -13,7 +13,7 @@ namespace apbd3.Services
 
         public PromoteResponse PromoteStudents(PromoteRequest request);
 
-        public Student GetStudentByIndexAsync(string index);
+        public Task<Student> GetStudentByIndexAsync(string index);
 
 
         public void SaveLogData(string data);

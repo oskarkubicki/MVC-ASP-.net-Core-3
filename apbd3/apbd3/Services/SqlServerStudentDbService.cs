@@ -88,12 +88,8 @@ namespace apbd3.Services
                     if (dr5.Read())
                     {
 
-
                         dr5.Close();
-
                         tran.Rollback();
-
-
 
                     }
 
@@ -112,9 +108,7 @@ namespace apbd3.Services
                     //...
                     com.ExecuteNonQuery();
 
-
                     com.CommandText = "Select * from enrollment where idstudy=@iDstuds and semester=1 and StartDate=(select max(StartDate) from Enrollment where IdStudy=@IdStuds)";
-
                     tran.Commit();
                     var dr4 = com.ExecuteReader();
 
@@ -150,16 +144,10 @@ namespace apbd3.Services
                 com.CommandText="Select * from student where IndexNumber=@index ";
  com.Parameters.AddWithValue("index", index);
 
-
-
                 using (var reader = await com.ExecuteReaderAsync()) { 
-
-
 
                     if(await reader.ReadAsync())
                     {
-
-                        
 
                         var student = new Student();
 
@@ -168,14 +156,11 @@ namespace apbd3.Services
                         student.Lastname = reader["LastName"].ToString();
                         student.IdStudent = (int) reader["IdEnrollment"];
 
-
                         return student;
-
 
                     }
                     else
                     {
-
                         return null;
 
                     }
