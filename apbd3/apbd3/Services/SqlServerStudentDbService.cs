@@ -230,8 +230,6 @@ namespace apbd3.Services
             try 
             {
 
-
-
                 using(StreamWriter w = File.AppendText("C:\\Users\\virion\\Desktop\\apbd3\\apbd3\\apbd3\\apbd3\\Log.txt")) {
 
 
@@ -240,9 +238,7 @@ namespace apbd3.Services
                     w.Flush();
                     w.Close();
 
-
                 }
-            
             
             }
             catch(Exception e)

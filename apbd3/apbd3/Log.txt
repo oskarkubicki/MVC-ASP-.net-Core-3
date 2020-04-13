@@ -24,3 +24,32 @@
 /api/enrollment POST  {"idStudent":0,"firstname":"Jesus","lastname":"Nazareth","birthDate":"1999/1/1","studies":"IT","semester":"1","indexNumber":"s666"}
 /weatherforecast GET  
 /api/enrollment POST  {"idStudent":0,"firstname":"Jesus","lastname":"Nazareth","birthDate":"1999/1/1","studies":"IT","semester":"1","indexNumber":"s666"}
+/weatherforecast GET  
+/api/enrollment POST  {"idStudent":0,"firstname":"Jesus","lastname":"Nazareth","birthDate":"1999/1/1","studies":"IT","semester":"1","indexNumber":"s666"}
+/weatherforecast GET  
+/favicon.ico GET  
+/weatherforecast GET  
+/favicon.ico GET  
+/weatherforecast GET  
+/favicon.ico GET  
+/weatherforecast GET  
+/favicon.ico GET  
+/weatherforecast GET  
+/favicon.ico GET  
+/weatherforecast GET  
+/api/enrollment POST  {"idStudent":0,"firstname":"oSKAR","lastname":"COTO","birthDate":"1956/1/1","studies":"IT","semester":"1","indexNumber":"s777"}
+/weatherforecast GET  
+/api/enrollment POST  {"idStudent":0,"firstname":"Oskar","lastname":"Niedziala","birthDate":"1993/10/10","studies":"IT","semester":"1","indexNumber":"s98753"}
+/weatherforecast GET  
+/api/enrollment POST  {"idStudent":0,"firstname":"Oskar","lastname":"Niedziala","birthDate":"1993/10/10","studies":"IT","semester":"1","indexNumber":"s98753"}
+/weatherforecast GET  
+/favicon.ico GET  
+/api/enrollment POST  {"idStudent":0,"firstname":"Oskar","lastname":"Niedziala","birthDate":"1993/10/10","studies":"IT","semester":"1","indexNumber":"s98753"}
+/weatherforecast GET  
+/favicon.ico GET  
+/weatherforecast GET  
+/favicon.ico GET  
+/weatherforecast GET  
+/api/enrollment POST  {"idStudent":0,"firstname":"oskar","lastname":"doplik","birthDate":"1944/1/1","studies":"IT","semester":"1","indexNumber":"s15324"}
+/weatherforecast GET  
+/api/enrollment POST  {"idStudent":0,"firstname":"oskar","lastname":"doplik","birthDate":"1944/1/1","studies":"IT","semester":"1","indexNumber":"s15324"}

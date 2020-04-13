@@ -21,37 +21,47 @@ namespace apbd3.Middlewares
 
         public async Task InvokeAsync(HttpContext httpContext,IStudentsDbService service)
         {
-        
+            string log = "";
 
-            if(httpContext.Request != null)
-            
+            if (httpContext.Request != null)
+
             {
-                string path = httpContext.Request.Path; 
-                string method = httpContext.Request.Method; 
+                string path = httpContext.Request.Path;
+                string method = httpContext.Request.Method;
                 string queryString = httpContext.Request.QueryString.ToString();
                 string bodyStr = "";
+
+
+                httpContext.Request.EnableBuffering();
+
+                
+
 
                 using (StreamReader reader = new StreamReader(httpContext.Request.Body, Encoding.UTF8, true, 1024, true))
                 {
                     bodyStr = await reader.ReadToEndAsync();
 
-                    string log = path + " " + method + " " + queryString + " " + bodyStr+"\n";
-              
-                     service.SaveLogData(log);
-                }
+                    httpContext.Request.Body.Position = 0;
 
-                     if(_next!=null)
-                    
-                    
-                    await _next(httpContext);
+
+                }
+                                            log = path + " " + method + " " + queryString + " " + bodyStr + "\n";
+
+                                            service.SaveLogData(log);
 
             }
 
+           
 
 
+            if (_next != null) { 
+                
+                await _next(httpContext);
+                }
+      
+            }
         }
             
     }
 
-    }
 
