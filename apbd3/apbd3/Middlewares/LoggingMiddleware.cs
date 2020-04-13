@@ -34,15 +34,20 @@ namespace apbd3.Middlewares
                 using (StreamReader reader = new StreamReader(httpContext.Request.Body, Encoding.UTF8, true, 1024, true))
                 {
                     bodyStr = await reader.ReadToEndAsync();
+
+                    string log = path + " " + method + " " + queryString + " " + bodyStr+"\n";
+              
+                     service.SaveLogData(log);
                 }
 
+                     if(_next!=null)
+                    
+                    
+                    await _next(httpContext);
 
-                string log = path + " " + method + " " + queryString + " " + bodyStr;
-              
-               service.SaveLogData(log);
             }
 
-if(_next!=null) await _next(httpContext);
+
 
         }
             

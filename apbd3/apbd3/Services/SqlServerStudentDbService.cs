@@ -232,7 +232,7 @@ namespace apbd3.Services
 
 
 
-                using(StreamWriter w = File.AppendText("C:\\Users\virion\\Desktop\apbd3\apbd3\apbd3\apbd3")) {
+                using(StreamWriter w = File.AppendText("C:\\Users\\virion\\Desktop\\apbd3\\apbd3\\apbd3\\apbd3\\Log.txt")) {
 
 
                     w.Write(data);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using apbd3.DAL;
+using apbd3.Middlewares;
 using apbd3.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -54,6 +55,9 @@ namespace apbd3
 
                 c.SwaggerEndpoint("/swagger/v1/swagger.json","Student API V1");
             });
+
+
+            app.UseMiddleware<LoggingMiddleware>();
 
             app.UseWhen(context => context.Request.Path.ToString().Contains("secret"), app => app.Use(async (context, next) =>
             {

@@ -1,0 +1,26 @@
+/weatherforecast GET  
+/api/enrollment POST  {"idStudent":0,"firstname":"Jesus","lastname":"Nazareth","birthDate":"1999/1/1","studies":"IT","semester":"1","indexNumber":"s666"}
+/weatherforecast GET  
+/api/enrollment POST  {"idStudent":0,"firstname":"Jesus","lastname":"Nazareth","birthDate":"1999/1/1","studies":"IT","semester":"1","indexNumber":"s666"}
+/weatherforecast GET  
+/api/enrollment POST  {"idStudent":0,"firstname":"Jesus","lastname":"Nazareth","birthDate":"1999/1/1","studies":"IT","semester":"1","indexNumber":"s666"}
+/weatherforecast GET  
+/weatherforecast GET  
+/weatherforecast GET  
+/api/enrollment POST  {"idStudent":0,"firstname":"Jesus","lastname":"Nazareth","birthDate":"1999/1/1","studies":"IT","semester":"1","indexNumber":"s666"}
+/api/enrollment POST  {"idStudent":0,"firstname":"Jakub","lastname":"Niedziala","birthDate":"1999/1/1","studies":"IT","semester":"1","indexNumber":"s666"}
+/weatherforecast GET  
+/api/enrollment POST  {"idStudent":0,"firstname":"Jesus","lastname":"Nazareth","birthDate":"1999/1/1","studies":"IT","semester":"1","indexNumber":"s666"}
+/weatherforecast GET  
+/api/enrollment POST  {"idStudent":0,"firstname":"Jesus","lastname":"Nazareth","birthDate":"1999/1/1","studies":"IT","semester":"1","indexNumber":"s666"}
+/api/enrollment POST  {"idStudent":0,"firstname":"Jesus","lastname":"Nazareth","birthDate":"1999/1/1","studies":"IT","semester":"1","indexNumber":"s666"}
+/weatherforecast GET  
+/api/enrollment POST  {"idStudent":0,"firstname":"string","lastname":"string","birthDate":"string","studies":"string","semester":"string","indexNumber":"string"}
+/weatherforecast GET  
+/api/enrollment POST  {"idStudent":0,"firstname":"Jesus","lastname":"Nazareth","birthDate":"1999/1/1","studies":"IT","semester":"1","indexNumber":"s666"}
+/weatherforecast GET  
+/api/enrollment POST  {"idStudent":0,"firstname":"Jesus","lastname":"Nazareth","birthDate":"1999/1/1","studies":"IT","semester":"1","indexNumber":"s666"}
+/weatherforecast GET  
+/api/enrollment POST  {"idStudent":0,"firstname":"Jesus","lastname":"Nazareth","birthDate":"1999/1/1","studies":"IT","semester":"1","indexNumber":"s666"}
+/weatherforecast GET  
+/api/enrollment POST  {"idStudent":0,"firstname":"Jesus","lastname":"Nazareth","birthDate":"1999/1/1","studies":"IT","semester":"1","indexNumber":"s666"}
