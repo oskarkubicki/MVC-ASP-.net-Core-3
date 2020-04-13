@@ -21,13 +21,13 @@ namespace apbd3.Middlewares
 
         public async Task InvokeAsync(HttpContext httpContext,IStudentsDbService service)
         {
-            //Our code
+        
 
             if(httpContext.Request != null)
             
             {
-                string path = httpContext.Request.Path; // /api/students
-                string method = httpContext.Request.Method; // GET, POST
+                string path = httpContext.Request.Path; 
+                string method = httpContext.Request.Method; 
                 string queryString = httpContext.Request.QueryString.ToString();
                 string bodyStr = "";
 
@@ -38,7 +38,7 @@ namespace apbd3.Middlewares
 
 
                 string log = path + " " + method + " " + queryString + " " + bodyStr;
-                // save to log file / log to database
+              
                service.SaveLogData(log);
             }
 

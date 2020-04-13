@@ -9,8 +9,6 @@ namespace apbd3.DTO
     public class PromoteResponse
     {
 
-        private Enrollment enrollment;
-
         public string Studies { get; set; }
 
         public int Semester { get; set; }

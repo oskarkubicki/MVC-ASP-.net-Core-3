@@ -3,6 +3,7 @@ using apbd3.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -226,7 +227,32 @@ namespace apbd3.Services
 
         public void SaveLogData(string data)
         {
-            throw new NotImplementedException();
+            try 
+            {
+
+
+
+                using(StreamWriter w = File.AppendText("C:\\Users\virion\\Desktop\apbd3\apbd3\apbd3\apbd3")) {
+
+
+                    w.Write(data);
+
+                    w.Flush();
+                    w.Close();
+
+
+                }
+            
+            
+            }
+            catch(Exception e)
+            {
+
+                Console.WriteLine(e.Message);
+
+
+
+            }
         }
     }
 } 
