@@ -51,9 +51,6 @@ namespace apbd3.Middlewares
 
             }
 
-           
-
-
             if (_next != null) { 
                 
                 await _next(httpContext);

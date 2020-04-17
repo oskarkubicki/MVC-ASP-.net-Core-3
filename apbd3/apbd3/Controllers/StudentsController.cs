@@ -69,7 +69,7 @@ namespace apbd3.Controllers
         }
 
 
-        [HttpGet("{index}")]
+        [HttpGet("secret/{index}")]
         public IActionResult GetStudent(string index)
         {
 
