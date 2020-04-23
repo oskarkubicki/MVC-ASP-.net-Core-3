@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using apbd3.DTO;
 using apbd3.Models;
@@ -45,6 +46,28 @@ namespace apbd3.Controllers
 
         }
 
+        [HttpGet]
+
+        public IActionResult Login(LoginRequest login)
+
+
+        {
+
+            var Cliams = new[] {
+
+                new Claim(ClaimTypes.NameIdentifier)
+            
+            
+            
+            
+            };
+
+
+
+
+
+        }
+
 
 
 
@@ -69,6 +92,9 @@ namespace apbd3.Controllers
 
 
             }
+
+
+
         }
 }
 

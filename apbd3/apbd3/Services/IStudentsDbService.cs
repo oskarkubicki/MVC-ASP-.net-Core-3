@@ -17,6 +17,9 @@ namespace apbd3.Services
 
 
         public void SaveLogData(string data);
+
+
+        public LoginResponse Login(LoginRequest loginRequest);
     
     }
 }

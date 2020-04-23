@@ -169,6 +169,43 @@ namespace apbd3.Services
             }
         }
 
+        public LoginResponse Login(LoginRequest loginRequest)
+        {
+
+            using (var client = new SqlConnection("Data Source=db-mssql.pjwstk.edu.pl;Initial Catalog=2019SBD;Integrated Security=True"))
+            using (var com = new SqlCommand())
+
+            {
+
+                com.CommandText = "select * from student where Indexnumber=@index and password=@pass ";
+
+
+
+                var dr = com.ExecuteReader();
+
+                if (!dr.Read())
+                {
+                    return null;
+                }
+
+                var response = new LoginResponse();
+                response.login = dr["indexnumber"].ToString();
+
+                response.name = dr["lname"].ToString();
+
+
+                return response;
+               
+
+            }
+
+
+
+
+
+                throw new NotImplementedException();
+        }
+
         public PromoteResponse PromoteStudents(PromoteRequest request)
         {
 
