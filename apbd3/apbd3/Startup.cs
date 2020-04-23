@@ -33,9 +33,10 @@ namespace apbd3
         public void ConfigureServices(IServiceCollection services)
         {
 
+
+            services.AddAuthorization();
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-
-
             {
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -43,7 +44,7 @@ namespace apbd3
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidIssuer = "Oskar",
-                    ValidAudience = "Employee",
+                    ValidAudience = "employee",
                     ValidateLifetime = true,
 
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["SecretKey"]))
@@ -52,6 +53,8 @@ namespace apbd3
 
 
             });
+
+           
             services.AddTransient<IStudentsDbService, SqlServerStudentDbService>();
             services.AddControllers();
             services.AddSingleton<IDbService, MockDbService>();
@@ -80,6 +83,10 @@ namespace apbd3
 
             app.UseMiddleware<LoggingMiddleware>();
 
+
+          
+          
+
             app.UseWhen(context => context.Request.Path.ToString().Contains("secret"), app => app.Use(async (context, next) =>
             {
                 if (!context.Request.Headers.ContainsKey("Index"))
@@ -106,7 +113,11 @@ namespace apbd3
 
             app.UseRouting();
 
-           // app.UseAuthorization();
+           // app.UseAuthorization(); 
+            
+            app.UseAuthentication();
+
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

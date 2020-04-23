@@ -1,28 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using apbd3.DTO;
 using apbd3.Models;
 using apbd3.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 namespace apbd3.Controllers
 {
     [Route("api/enrollment")]
     [ApiController]
+
+    [Authorize(Roles ="employee") ]
     public class EnrollmentsController : ControllerBase
     {
 
         readonly IStudentsDbService _service;
 
-        //Constructor injection (SOLID - D - Dependency Injection)
-        public EnrollmentsController(IStudentsDbService service)
+        public IConfiguration Configuration { get; set; }
+
+    
+        public EnrollmentsController(IStudentsDbService service,IConfiguration configuration)
         {
             _service = service;
+
+            Configuration = configuration;
+
+            
         }
 
         [HttpPost]
@@ -48,25 +61,58 @@ namespace apbd3.Controllers
 
         [HttpGet]
 
+        [AllowAnonymous]
+        
+
         public IActionResult Login(LoginRequest login)
-
-
         {
+
+            var response = _service.Login(login);
+
+
 
             var Cliams = new[] {
 
-                new Claim(ClaimTypes.NameIdentifier)
+                new Claim(ClaimTypes.NameIdentifier,response.login),
+                new Claim(ClaimTypes.Name,response.name),
+                new Claim(ClaimTypes.Role,"employee") };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["SecretKey"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+
+
+            var token = new JwtSecurityToken(
+
+                issuer: "Oskar",
+                audience: "employee",
+                claims: Cliams,
+                expires: DateTime.Now.AddMinutes(10),
+                signingCredentials: creds
+
+                );
+
+
+
+            return Ok(new
+            {
+
+
+                token = new JwtSecurityTokenHandler().WriteToken(token),
+                refreshToken = Guid.NewGuid()
+
+            });
+
             
+
             
-            
-            
-            };
+            }
 
 
 
 
 
-        }
+        
 
 
 

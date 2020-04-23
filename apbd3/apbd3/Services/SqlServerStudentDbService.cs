@@ -177,7 +177,18 @@ namespace apbd3.Services
 
             {
 
-                com.CommandText = "select * from student where Indexnumber=@index and password=@pass ";
+                com.CommandText = "select * from student where Indexnumber=@index and password=@pass";
+
+
+                com.Parameters.AddWithValue("pass", loginRequest.password);
+
+                com.Parameters.AddWithValue("index", loginRequest.login);
+
+
+                client.Open();
+
+
+                com.Connection = client;
 
 
 
@@ -189,9 +200,9 @@ namespace apbd3.Services
                 }
 
                 var response = new LoginResponse();
-                response.login = dr["indexnumber"].ToString();
+                response.login = dr["IndexNumber"].ToString();
 
-                response.name = dr["lname"].ToString();
+                response.name = dr["LastName"].ToString();
 
 
                 return response;
@@ -199,11 +210,6 @@ namespace apbd3.Services
 
             }
 
-
-
-
-
-                throw new NotImplementedException();
         }
 
         public PromoteResponse PromoteStudents(PromoteRequest request)
