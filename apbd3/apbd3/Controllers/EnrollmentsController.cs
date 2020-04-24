@@ -141,16 +141,16 @@ namespace apbd3.Controllers
 
 
 
-
+        [AllowAnonymous]
         [HttpPost("refresh-token/{token}")]
 
 
-        public IAction RefreshToken(string requestToken)
+        public IActionResult RefreshToken(string token)
 
         {
 
 
-            var data = _service.CheckToken(requestToken);
+            var data = _service.CheckToken(token);
 
             if(data!=null){
 
@@ -167,7 +167,7 @@ namespace apbd3.Controllers
 
 
 
-                var token = new JwtSecurityToken(
+                var accestoken = new JwtSecurityToken(
 
                     issuer: "Oskar",
                     audience: "employee",
@@ -189,7 +189,7 @@ namespace apbd3.Controllers
                 {
 
 
-                    token = new JwtSecurityTokenHandler().WriteToken(token),
+                    token = new JwtSecurityTokenHandler().WriteToken(accestoken),
                     refreshToken
 
                 });
@@ -200,12 +200,8 @@ namespace apbd3.Controllers
             else
             {
 
-                return BadRequest("Invalid Tokens")
+                return BadRequest("Invalid Tokens");
             }
-
-
-
-
 
 
         }
