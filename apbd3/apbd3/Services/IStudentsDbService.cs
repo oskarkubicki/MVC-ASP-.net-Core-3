@@ -20,6 +20,14 @@ namespace apbd3.Services
 
 
         public LoginResponse Login(LoginRequest loginRequest);
+
+
+        public void SaveToken(string login, string name, string token);
+
+
+        public TokenResponse CheckToken(string token);
+        
+        
     
     }
 }

@@ -9,8 +9,6 @@ namespace apbd3.DTO
     {
 
         public string login { get; set; }
-
-
         public string name { get; set; }
     }
 }

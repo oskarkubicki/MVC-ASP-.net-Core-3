@@ -69,7 +69,7 @@ namespace apbd3.Services
 
                         var dr6 = com.ExecuteNonQuery();
 
-                        
+
 
                     }
                     else
@@ -80,7 +80,7 @@ namespace apbd3.Services
 
                     dr2.Close();
 
-                    
+
 
                     com.CommandText = "SELECT * FROM Student WHERE IndexNumber =@indexs";
                     com.Parameters.AddWithValue("indexs", student.IndexNumber);
@@ -139,15 +139,16 @@ namespace apbd3.Services
         {
 
             using (var client = new SqlConnection("Data Source=db-mssql.pjwstk.edu.pl;Initial Catalog=2019SBD;Integrated Security=True"))
-            using (var com = new SqlCommand()) 
+            using (var com = new SqlCommand())
             {
 
-                com.CommandText="Select * from student where IndexNumber=@index ";
- com.Parameters.AddWithValue("index", index);
+                com.CommandText = "Select * from student where IndexNumber=@index ";
+                com.Parameters.AddWithValue("index", index);
 
-                using (var reader = await com.ExecuteReaderAsync()) { 
+                using (var reader = await com.ExecuteReaderAsync())
+                {
 
-                    if(await reader.ReadAsync())
+                    if (await reader.ReadAsync())
                     {
 
                         var student = new Student();
@@ -155,7 +156,7 @@ namespace apbd3.Services
                         student.BirthDate = reader["Birthdate"].ToString();
                         student.Firstname = reader["FirstName"].ToString();
                         student.Lastname = reader["LastName"].ToString();
-                        student.IdStudent = (int) reader["IdEnrollment"];
+                        student.IdStudent = (int)reader["IdEnrollment"];
 
                         return student;
 
@@ -206,7 +207,7 @@ namespace apbd3.Services
 
 
                 return response;
-               
+
 
             }
 
@@ -270,10 +271,11 @@ namespace apbd3.Services
 
         public void SaveLogData(string data)
         {
-            try 
+            try
             {
 
-                using(StreamWriter w = File.AppendText("C:\\Users\\virion\\Desktop\\apbd3\\apbd3\\apbd3\\apbd3\\Log.txt")) {
+                using (StreamWriter w = File.AppendText("C:\\Users\\virion\\Desktop\\apbd3\\apbd3\\apbd3\\apbd3\\Log.txt"))
+                {
 
 
                     w.Write(data);
@@ -282,9 +284,9 @@ namespace apbd3.Services
                     w.Close();
 
                 }
-            
+
             }
-            catch(Exception e)
+            catch (Exception e)
             {
 
                 Console.WriteLine(e.Message);
@@ -292,6 +294,74 @@ namespace apbd3.Services
 
 
             }
+        }
+
+        public void SaveToken(string login, string name, string token)
+        {
+            using (var client = new SqlConnection("Data Source=db-mssql.pjwstk.edu.pl;Initial Catalog=2019SBD;Integrated Security=True"))
+            using (var com = new SqlCommand())
+
+            {
+
+                client.Open();
+                com.Connection = client;
+
+
+                com.CommandText = "insert into RefreshToken (Login,Name,RefreshToken) values (@login,@name,@token)";
+                com.Parameters.AddWithValue("login", login);
+                com.Parameters.AddWithValue("name", name);
+                com.Parameters.AddWithValue("token", token);
+
+                com.ExecuteNonQuery();
+
+            }
+        }
+
+
+
+        public TokenResponse CheckToken(string token) 
+        {
+
+
+
+            using (var client = new SqlConnection("Data Source=db-mssql.pjwstk.edu.pl;Initial Catalog=2019SBD;Integrated Security=True"))
+            using (var com = new SqlCommand())
+
+            {
+
+                client.Open();
+                com.Connection = client;
+
+
+                com.CommandText = "select * from RefreshToken where RefreshToken.RefreshToken=@token ";
+                com.Parameters.AddWithValue("token", token);
+
+
+                var dr = com.ExecuteReader();
+
+
+                if (!dr.Read())
+                {
+
+
+                    return null;
+                }
+                else
+
+                {
+
+                    var response = new TokenResponse();
+
+                    response.login = dr["Login"].ToString();
+                    response.name = dr["Name"].ToString();
+
+                    return response;
+        
+                } 
+
+            }
+
+
         }
     }
 } 

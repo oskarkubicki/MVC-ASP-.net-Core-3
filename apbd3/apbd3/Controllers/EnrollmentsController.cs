@@ -20,7 +20,7 @@ namespace apbd3.Controllers
     [Route("api/enrollment")]
     [ApiController]
 
-    [Authorize(Roles ="employee") ]
+    [Authorize(Roles = "employee")]
     public class EnrollmentsController : ControllerBase
     {
 
@@ -28,14 +28,14 @@ namespace apbd3.Controllers
 
         public IConfiguration Configuration { get; set; }
 
-    
-        public EnrollmentsController(IStudentsDbService service,IConfiguration configuration)
+
+        public EnrollmentsController(IStudentsDbService service, IConfiguration configuration)
         {
             _service = service;
 
             Configuration = configuration;
 
-            
+
         }
 
         [HttpPost]
@@ -62,7 +62,7 @@ namespace apbd3.Controllers
         [HttpGet]
 
         [AllowAnonymous]
-        
+
 
         public IActionResult Login(LoginRequest login)
         {
@@ -92,6 +92,12 @@ namespace apbd3.Controllers
 
                 );
 
+            var refreshToken = Guid.NewGuid();
+
+
+            _service.SaveToken(response.login, response.name, refreshToken.ToString());
+
+
 
 
             return Ok(new
@@ -99,21 +105,11 @@ namespace apbd3.Controllers
 
 
                 token = new JwtSecurityTokenHandler().WriteToken(token),
-                refreshToken = Guid.NewGuid()
+                refreshToken
 
             });
 
-            
-
-            
-            }
-
-
-
-
-
-        
-
+        }
 
 
 
@@ -122,12 +118,13 @@ namespace apbd3.Controllers
         {
 
 
-            var enrollment= _service.PromoteStudents(promotion);
+            var enrollment = _service.PromoteStudents(promotion);
 
 
-            if (enrollment != null) { 
-            
-            return new ObjectResult(enrollment) { StatusCode = StatusCodes.Status201Created };
+            if (enrollment != null)
+            {
+
+                return new ObjectResult(enrollment) { StatusCode = StatusCodes.Status201Created };
             }
 
 
@@ -137,11 +134,82 @@ namespace apbd3.Controllers
             }
 
 
+        }
+
+
+
+
+
+
+
+        [HttpPost("refresh-token/{token}")]
+
+
+        public IAction RefreshToken(string requestToken)
+
+        {
+
+
+            var data = _service.CheckToken(requestToken);
+
+            if(data!=null){
+
+
+
+                var Cliams = new[] {
+
+                new Claim(ClaimTypes.NameIdentifier,data.login),
+                new Claim(ClaimTypes.Name,data.name),
+                new Claim(ClaimTypes.Role,"employee") };
+
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["SecretKey"]));
+                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+
+
+                var token = new JwtSecurityToken(
+
+                    issuer: "Oskar",
+                    audience: "employee",
+                    claims: Cliams,
+                    expires: DateTime.Now.AddMinutes(10),
+                    signingCredentials: creds
+
+                    );
+
+                var refreshToken = Guid.NewGuid();
+
+
+                _service.SaveToken(data.login, data.name, refreshToken.ToString());
+
+
+
+
+                return Ok(new
+                {
+
+
+                    token = new JwtSecurityTokenHandler().WriteToken(token),
+                    refreshToken
+
+                });
+
+
+
+            }
+            else
+            {
+
+                return BadRequest("Invalid Tokens")
             }
 
 
 
+
+
+
         }
+    }
 }
 
 
