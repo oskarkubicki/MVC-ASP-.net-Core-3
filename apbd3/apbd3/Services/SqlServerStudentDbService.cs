@@ -1,10 +1,13 @@
 ﻿using apbd3.DTO;
+using apbd3.Handlers;
 using apbd3.Models;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace apbd3.Services
@@ -178,6 +181,31 @@ namespace apbd3.Services
 
             {
 
+
+               
+
+
+                com.CommandText = "select * from Salt where saltID=@id";
+
+
+                com.Parameters.AddWithValue("id", 1);
+
+                client.Open();
+
+                com.Connection = client;
+
+
+                var dr = com.ExecuteReader();
+
+
+                dr.Read();
+
+
+                var saltc = dr["salt"].ToString();
+
+                loginRequest.password = PasswordGenerator.Create(loginRequest.password, saltc);
+                
+
                 com.CommandText = "select * from student where Indexnumber=@index and password=@pass";
 
 
@@ -186,24 +214,20 @@ namespace apbd3.Services
                 com.Parameters.AddWithValue("index", loginRequest.login);
 
 
-                client.Open();
 
+                dr.Close();
 
-                com.Connection = client;
+                var dr2 = com.ExecuteReader();
 
-
-
-                var dr = com.ExecuteReader();
-
-                if (!dr.Read())
+                if (!dr2.Read())
                 {
                     return null;
                 }
 
                 var response = new LoginResponse();
-                response.login = dr["IndexNumber"].ToString();
+                response.login = dr2["IndexNumber"].ToString();
 
-                response.name = dr["LastName"].ToString();
+                response.name = dr2["LastName"].ToString();
 
 
                 return response;
