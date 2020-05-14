@@ -177,10 +177,11 @@ namespace apbd3.Controllers
 
             _StudentContext.Student.Attach(zmiana);
 
-            zmiana = student;
-
-
-           
+            zmiana.IndexNumber = student.IndexNumber;
+            zmiana.FirstName = student.FirstName;
+            zmiana.LastName = student.LastName;
+            zmiana.BirthDate = student.BirthDate;
+            zmiana.IdEnrollment= student.IdEnrollment;
 
             _StudentContext.SaveChanges();
 
@@ -203,6 +204,33 @@ namespace apbd3.Controllers
             _StudentContext.SaveChanges();
             
             return Ok(student);
+        }
+
+
+
+
+        [HttpDelete("entity/del/{index}")]
+
+
+        public IActionResult delStudent(string index)
+
+
+        {
+
+
+            var zmiana = new Entities.Student();
+
+            zmiana.IndexNumber = index;
+
+            _StudentContext.Student.Attach(zmiana);
+
+
+
+            _StudentContext.Remove(zmiana);
+
+            _StudentContext.SaveChanges();
+
+            return Ok("deleted student");
         }
 
     }
