@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using apbd3.DAL;
+using apbd3.Entities;
 using apbd3.Middlewares;
 using apbd3.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -33,7 +35,7 @@ namespace apbd3
         public void ConfigureServices(IServiceCollection services)
         {
 
-
+            services.AddDbContext<StudentContext>(e => e.UseSqlServer(Configuration["ConnectionStrings:DefaultConnectionString"]));
             services.AddAuthorization();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>

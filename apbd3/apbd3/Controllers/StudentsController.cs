@@ -7,6 +7,7 @@ using apbd3.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using System.Data.SqlClient;
+using apbd3.Entities;
 
 namespace apbd3.Controllers
 
@@ -19,15 +20,30 @@ namespace apbd3.Controllers
     {
         private readonly IDbService _dbservice;
 
-        List<Student> lista;
-        List<Enrollment> lista2;
+        List<Models.Student> lista;
+        List<Models.Enrollment> lista2;
+
+        private readonly StudentContext _StudentContext;
 
 
-        public StudentsController(IDbService dbService)
+        public StudentsController(IDbService dbService, StudentContext student)
         
         {
 
+            _StudentContext = student;
+
             _dbservice = dbService;
+        }
+
+        [HttpGet("entity")]
+        public IActionResult GetStudentsE()
+
+        {
+ var students = _StudentContext.Student.ToList();
+            return Ok(students);
+
+
+
         }
         
         [HttpGet]
@@ -46,13 +62,13 @@ namespace apbd3.Controllers
                 var dr = com.ExecuteReader();
 
 
-                lista = new List<Student>();
+                lista = new List<Models.Student>();
 
 
                 while (dr.Read())
                 {
 
-                    var st = new Student();
+                    var st = new Models.Student();
                     st.Firstname = dr["FirstName"].ToString();
                     st.Lastname = dr["LastName"].ToString();
                     st.BirthDate = dr["BirthDate"].ToString();
@@ -86,12 +102,12 @@ namespace apbd3.Controllers
                 var dr = com.ExecuteReader();
 
 
-                lista2 = new List<Enrollment>();
+                lista2 = new List<Models.Enrollment>();
 
 
                 while (dr.Read())
                 {
-                    var st = new Enrollment();
+                    var st = new Models.Enrollment();
 
                     st.Idenrollment = Convert.ToInt32(dr["IdEnrollment"]);
                     st.semester =  (int) dr["Semester"];
@@ -109,7 +125,7 @@ namespace apbd3.Controllers
         [HttpPost]
 
 
-        public IActionResult createStudent(Student student)
+        public IActionResult createStudent(Models.Student student)
         {
             student.IndexNumber = $"s{new Random().Next(1, 20000)}";
             return Ok(student);
@@ -125,7 +141,7 @@ namespace apbd3.Controllers
 
         {
 
-            Student student = new Student();
+            Models.Student student = new Models.Student();
             student.IdStudent = Id;
             student.IndexNumber = $"s{new Random().Next(1, 20000)}";
             return Ok("Update complete");
@@ -143,5 +159,55 @@ namespace apbd3.Controllers
             return Ok("Delete complete");
         }
 
+
+
+
+        [HttpPost("entity/change")]
+
+
+        public IActionResult updateStudentE(Entities.Student student)
+        {
+
+
+
+            var zmiana = new Entities.Student();
+
+            zmiana.IndexNumber = student.IndexNumber;
+
+
+            _StudentContext.Student.Attach(zmiana);
+
+            zmiana = student;
+
+
+           
+
+            _StudentContext.SaveChanges();
+
+
+            return Ok(student);
+        }
+
+
+
+        [HttpPut("entity/add")]
+
+
+        public IActionResult putStudent(Entities.Student student)
+
+
+        {
+
+            _StudentContext.Add<Entities.Student>(student);
+
+            _StudentContext.SaveChanges();
+            
+            return Ok(student);
+        }
+
     }
+
+
+
+
 }
