@@ -1,4 +1,5 @@
 ﻿using apbd3.DTO;
+using apbd3.Entities;
 using apbd3.Handlers;
 using apbd3.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -14,13 +15,20 @@ namespace apbd3.Services
 {
     public class SqlServerStudentDbService : IStudentsDbService
     {
-        public EnrollmentResponse EnrollStudent(Student student)
+        private readonly StudentContext _context;
+
+        public SqlServerStudentDbService(StudentContext context)
         {
-            using (var client = new SqlConnection("Data Source=db-mssql.pjwstk.edu.pl;Initial Catalog=2019SBD;Integrated Security=True"))
-            using (var com = new SqlCommand())
+
+            _context = context;
+
+        }
+        public EnrollmentResponse EnrollStudent(Models.Student student)
+        {
+        
 
 
-            {
+            
                 if (student.IndexNumber == null || student.Firstname == null || student.Lastname == null || student.BirthDate == null || student.Studies == null)
                 {
 
@@ -28,117 +36,175 @@ namespace apbd3.Services
                 }
                 else
                 {
-                    int idEnrollment;
-                    client.Open();
-                    com.Connection = client;
-                    var tran = client.BeginTransaction();
-                    com.Transaction = tran;
-                    com.CommandText = "select * from Studies where Name=@index";
-                    com.Parameters.AddWithValue("index", student.Studies);
+                    int result1;
+                    //int idEnrollment;
+                    //client.Open();
+                    //com.Connection = client;
+                    //var tran = client.BeginTransaction();
+                    //com.Transaction = tran;
+                    //com.CommandText = "select * from Studies where Name=@index";
+                    //com.Parameters.AddWithValue("index", student.Studies);
 
-                    var dr = com.ExecuteReader();
 
-                    if (!dr.Read())
+
+
+
+                    var result = _context.Studies.Select(e => new {
+
+
+                        e.IdStudy,
+                        e.Name
+                    }).Where(d => d.Name.Equals(student.Studies));
+
+
+                    //var dr = com.ExecuteReader();
+
+                    if (result == null)
                     {
-                        tran.Rollback();
+                        return null;
                     }
 
-                    int idStudies = (int)dr["IdStudy"];
-                    dr.Close();
-                    com.CommandText = "SELECT * FROM Enrollment WHERE Semester=1 AND IdStudy=@IdStud";
 
-                    com.Parameters.AddWithValue("IdStud", idStudies);
 
-                    var dr2 = com.ExecuteReader();
+                    int idStudies = result.Select(e => e.IdStudy).First();
 
-                    if (!dr2.Read())
+
+                    //dr.Close();
+
+                    var fromEnr= _context.Enrollment.Select(e =>e ).Where(e => e.Semester==1 && e.IdStudy==idStudies);
+
+
+                    //com.CommandText = "SELECT * FROM Enrollment WHERE Semester=1 AND IdStudy=@IdStud";
+
+                    //com.Parameters.AddWithValue("IdStud", idStudies);
+
+                    //var dr2 = com.ExecuteReader();
+
+                    if (fromEnr==null)
                     {
 
-                        dr2.Close();
-                        com.CommandText = "Select max(idenrollment) from enrollment";
+                        //dr2.Close();
+                        //com.CommandText = "Select max(idenrollment) from enrollment";
 
-                        var dr3 = com.ExecuteReader();
+                         result1 = _context.Enrollment.Max(e => e.IdEnrollment);
 
-                        dr3.Read();
+                        //var dr3 = com.ExecuteReader();
 
-                        idEnrollment = dr3.GetInt32(0);
+                        //dr3.Read();
 
-                        dr3.Close();
-                        com.CommandText = "INSERT INTO Enrollment(idEnrollment, semester, idStudy,StartDate) VALUES (@idE, @Semester,@IdStudy,@sd)";
-                        com.Parameters.AddWithValue("idE", idEnrollment + 1);
-                        com.Parameters.AddWithValue("Semester", 1);
-                        com.Parameters.AddWithValue("IdStudy", idStudies);
-                        com.Parameters.AddWithValue("sd", DateTime.Now.ToString());
+                        //idEnrollment = dr3.GetInt32(0);
 
-                        var dr6 = com.ExecuteNonQuery();
+                        //dr3.Close();
+
+                        var newEnroll = new Entities.Enrollment()
+                        {
+                            IdEnrollment = result1 + 1,
+                            Semester = 1,
+                            IdStudy = idStudies,
+                            StartDate = DateTime.Now
 
 
+                        };
+
+                        _context.Enrollment.Add(newEnroll);
+
+                        _context.SaveChanges();
+
+
+                        //com.CommandText = "INSERT INTO Enrollment(idEnrollment, semester, idStudy,StartDate) VALUES (@idE, @Semester,@IdStudy,@sd)";
+                        //com.Parameters.AddWithValue("idE", idEnrollment + 1);
+                        //com.Parameters.AddWithValue("Semester", 1);
+                        //com.Parameters.AddWithValue("IdStudy", idStudies);
+                        //com.Parameters.AddWithValue("sd", DateTime.Now.ToString());
+
+                        //var dr6 = com.ExecuteNonQuery();
 
                     }
                     else
                     {
 
-                        idEnrollment = (int)dr2["IdEnrollment"];
+                        result1 = fromEnr.Select(e => e.IdEnrollment).First();
                     }
 
-                    dr2.Close();
 
 
 
-                    com.CommandText = "SELECT * FROM Student WHERE IndexNumber =@indexs";
-                    com.Parameters.AddWithValue("indexs", student.IndexNumber);
-                    var dr5 = com.ExecuteReader();
 
-                    if (dr5.Read())
+
+                var dont2 = _context.Student.Select(e => new { e.IndexNumber }).Where(d => d.IndexNumber.Equals(student.IndexNumber)).FirstOrDefault();
+
+                //com.CommandText = "SELECT * FROM Student WHERE IndexNumber =@indexs";
+                //com.Parameters.AddWithValue("indexs", student.IndexNumber);
+                //var dr5 = com.ExecuteReader();
+
+                if (dont2!=null)
                     {
 
-                        dr5.Close();
-                        tran.Rollback();
+                        return null;
 
                     }
 
-                    dr5.Close();
-
-                    com.Parameters.AddWithValue("IdStuds", idStudies);
-
-                    com.CommandText = "INSERT INTO Student(IndexNumber, FirstName, LastName,Birthdate,IdEnrollment) VALUES (@Indexn,@FirstName, @LastName,@Birthdate,@Studies)";
-                    //...
-                    com.Parameters.AddWithValue("FirstName", student.Firstname);
-                    com.Parameters.AddWithValue("Indexn", student.IndexNumber);
-                    com.Parameters.AddWithValue("LastName", student.Lastname);
-                    com.Parameters.AddWithValue("Birthdate", DateTime.Parse(student.BirthDate));
-                    com.Parameters.AddWithValue("Studies", idEnrollment);
-
-                    //...
-                    com.ExecuteNonQuery();
-
-                    com.CommandText = "Select * from enrollment where idstudy=@iDstuds and semester=1 and StartDate=(select max(StartDate) from Enrollment where IdStudy=@IdStuds)";
-                    tran.Commit();
-                    var dr4 = com.ExecuteReader();
 
 
-                    var enrollment = new Enrollment();
-                    while (dr4.Read())
+                    //com.Parameters.AddWithValue("IdStuds", idStudies);
+
+                    _context.Add(new Entities.Student()
                     {
-                        enrollment.Idenrollment = (int)dr4["idEnrollment"];
-                        enrollment.semester = (int)dr4["Semester"];
-                        enrollment.IdStudy = (int)dr4["IdStudy"];
-                        var StartDate = dr4["StartDate"];
-                        enrollment.StartDate = StartDate.ToString();
 
-                    }
+                        FirstName = student.Firstname,
+                        IndexNumber = student.IndexNumber,
+                        LastName = student.Lastname,
+                        BirthDate = DateTime.Now,
+                        IdEnrollment = result1
 
-                    dr4.Close();
+                    });
+
+                    _context.SaveChanges();
+
+                    //com.CommandText = "INSERT INTO Student(IndexNumber, FirstName, LastName,Birthdate,IdEnrollment) VALUES (@Indexn,@FirstName, @LastName,@Birthdate,@Studies)";
+                    ////...
+                    //com.Parameters.AddWithValue("FirstName", student.Firstname);
+                    //com.Parameters.AddWithValue("Indexn", student.IndexNumber);
+                    //com.Parameters.AddWithValue("LastName", student.Lastname);
+                    //com.Parameters.AddWithValue("Birthdate", DateTime.Parse(student.BirthDate));
+                    //com.Parameters.AddWithValue("Studies", idEnrollment);
+
+                    ////...
+                    //com.ExecuteNonQuery();
+
+
+                   var hello =_context.Enrollment.Select(e => e).Where(e => e.IdStudy==idStudies && e.Semester==1 && e.StartDate== _context.Enrollment.Where(e => e.IdStudy==idStudies).Max(e => e.StartDate));
+
+                    //com.CommandText = "Select * from enrollment where idstudy=@iDstuds and semester=1 and StartDate=(select max(StartDate) from Enrollment where IdStudy=@IdStuds)";
+                    //tran.Commit();
+                    //var dr4 = com.ExecuteReader();
+
+
+                    var enrollment = new Models.Enrollment();
+
+                    
+                    
+                   
+                    
+                        enrollment.Idenrollment = hello.First().IdEnrollment;
+                        enrollment.semester = hello.First().Semester;
+                        enrollment.IdStudy = hello.First().IdStudy;
+                      enrollment.StartDate   =  hello.First().StartDate.ToString();
+                       
+
+                    
+
+                  
 
 
                     var er = new EnrollmentResponse(enrollment);
 
                     return er;
                 }
-            }
+            
         }
 
-        public async Task<Student> GetStudentByIndexAsync(string index)
+        public async Task<Models.Student> GetStudentByIndexAsync(string index)
         {
 
             using (var client = new SqlConnection("Data Source=db-mssql.pjwstk.edu.pl;Initial Catalog=2019SBD;Integrated Security=True"))
@@ -154,7 +220,7 @@ namespace apbd3.Services
                     if (await reader.ReadAsync())
                     {
 
-                        var student = new Student();
+                        var student = new Models.Student();
 
                         student.BirthDate = reader["Birthdate"].ToString();
                         student.Firstname = reader["FirstName"].ToString();
@@ -280,7 +346,7 @@ namespace apbd3.Services
 
                 dr2.Read();
 
-                var enrollment = new Enrollment();
+                var enrollment = new Models.Enrollment();
 
                 enrollment.IdStudy = (int)dr2["IdStudy"];
                 enrollment.semester = (int)dr2["Semester"];

@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using apbd3.DTO;
+using apbd3.Entities;
 using apbd3.Models;
 using apbd3.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -24,6 +25,7 @@ namespace apbd3.Controllers
     public class EnrollmentsController : ControllerBase
     {
 
+
         readonly IStudentsDbService _service;
 
         public IConfiguration Configuration { get; set; }
@@ -39,7 +41,8 @@ namespace apbd3.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddStudent(Student student)
+        [AllowAnonymous]
+        public IActionResult AddStudent(Models.Student student)
         {
 
 
