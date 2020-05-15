@@ -41,7 +41,7 @@ namespace apbd3.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
+        
         public IActionResult AddStudent(Models.Student student)
         {
 
@@ -114,7 +114,7 @@ namespace apbd3.Controllers
 
         }
 
-
+        [AllowAnonymous]
 
         [HttpPost("promotions")]
         public IActionResult promoteStudent(PromoteRequest promotion)

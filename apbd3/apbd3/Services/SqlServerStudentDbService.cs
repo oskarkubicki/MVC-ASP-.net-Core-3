@@ -3,9 +3,10 @@ using apbd3.Entities;
 using apbd3.Handlers;
 using apbd3.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -306,51 +307,66 @@ namespace apbd3.Services
         public PromoteResponse PromoteStudents(PromoteRequest request)
         {
 
-            using (var client = new SqlConnection("Data Source=db-mssql.pjwstk.edu.pl;Initial Catalog=2019SBD;Integrated Security=True"))
-            using (var com = new SqlCommand())
+            //using (var client = new SqlConnection("Data Source=db-mssql.pjwstk.edu.pl;Initial Catalog=2019SBD;Integrated Security=True"))
+            //using (var com = new SqlCommand())
 
             {
 
-                client.Open();
-                com.Connection = client;
+                //client.Open();
+                //com.Connection = client;
 
 
-                com.CommandText = "select * from Enrollment,Studies where Enrollment.IdStudy=Studies.IdStudy and Enrollment.semester=@semester and Studies.Name=@Studies";
-                com.Parameters.AddWithValue("semester", request.Semester);
-                com.Parameters.AddWithValue("Studies", request.Studies);
 
-                var dr = com.ExecuteReader();
+                var result = _context.Enrollment.Join(_context.Studies, p => p.IdStudy, v => v.IdStudy, (p, v) => new { p, v }).Where(d => d.p.Semester == request.Semester && d.v.Name.Equals(request.Studies)).FirstOrDefault();
 
-                if (!dr.Read())
+                //com.CommandText = "select * from Enrollment,Studies where Enrollment.IdStudy=Studies.IdStudy and Enrollment.semester=@semester and Studies.Name=@Studies";
+                //com.Parameters.AddWithValue("semester", request.Semester);
+                //com.Parameters.AddWithValue("Studies", request.Studies);
+
+                //var dr = com.ExecuteReader();
+
+                if (result==null)
                 {
                     return null;
                 }
 
-                dr.Close();
-
-                com.CommandType = System.Data.CommandType.StoredProcedure;
-
-                com.CommandText = "Promotion";
-                com.ExecuteNonQuery();
+                //dr.Close();
 
 
-                com.CommandType = System.Data.CommandType.Text;
+
+                var name = new SqlParameter("@name", request.Studies);
+                var semester = new SqlParameter("@semester", request.Semester);
+
+                var list1 = _context.Database.ExecuteSqlCommand("exec Promotion @name, @semester", name, semester);
+
+                //com.CommandType = System.Data.CommandType.StoredProcedure;
+
+                //com.CommandText = "Promotion";
+                //com.ExecuteNonQuery();
 
 
-                com.CommandText = "select * from Enrollment,Studies where Enrollment.IdStudy=Studies.IdStudy and Name=@Studies and Semester=@semestern";
-
-                com.Parameters.AddWithValue("semestern", request.Semester + 1);
-
-                var dr2 = com.ExecuteReader();
+                //com.CommandType = System.Data.CommandType.Text;
 
 
-                dr2.Read();
+               
+
+                     var result3 = _context.Enrollment.Join(_context.Studies, p => p.IdStudy, v => v.IdStudy, (p, v) => new { p, v }).Where(d => d.p.Semester == request.Semester+1 && d.v.Name.Equals(request.Studies)).FirstOrDefault();
+
+
+                //com.CommandText = "select * from Enrollment,Studies where Enrollment.IdStudy=Studies.IdStudy and Name=@Studies and Semester=@semestern";
+
+                //com.Parameters.AddWithValue("semestern", request.Semester + 1);
+
+                //var dr2 = com.ExecuteReader();
+
+
+                //dr2.Read();
 
                 var enrollment = new Models.Enrollment();
 
-                enrollment.IdStudy = (int)dr2["IdStudy"];
-                enrollment.semester = (int)dr2["Semester"];
-                var StartDate = dr2["StartDate"];
+                enrollment.IdStudy = result3.p.IdStudy;
+                enrollment.semester = result3.p.Semester;
+                var StartDate = result3.p.StartDate;
                 enrollment.StartDate = StartDate.ToString();
 
                 var promotion = new PromoteResponse(enrollment);
