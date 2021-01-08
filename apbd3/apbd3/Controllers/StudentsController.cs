@@ -41,9 +41,7 @@ namespace apbd3.Controllers
         {
  var students = _StudentContext.Student.ToList();
             return Ok(students);
-
-
-
+            
         }
         
         [HttpGet]
@@ -54,17 +52,14 @@ namespace apbd3.Controllers
                 using(var com =new SqlCommand())
             
             {
-
                 com.Connection = client;
                 com.CommandText = "select FirstName,LastName,BirthDate,Name,Semester from Student,Studies,Enrollment where Student.IdEnrollment=Enrollment.IdEnrollment and Enrollment.IdStudy=Studies.IdStudy";
 
                 client.Open();
                 var dr = com.ExecuteReader();
-
-
+                
                 lista = new List<Models.Student>();
-
-
+                
                 while (dr.Read())
                 {
 
@@ -74,8 +69,7 @@ namespace apbd3.Controllers
                     st.BirthDate = dr["BirthDate"].ToString();
                     st.Studies = dr["Name"].ToString();
                     st.Semester = dr["Semester"].ToString();
-
-
+                    
                     lista.Add(st);
 
                 }
@@ -83,8 +77,7 @@ namespace apbd3.Controllers
             }
             return Ok(lista);
         }
-
-
+        
         [HttpGet("secret/{index}")]
         public IActionResult GetStudent(string index)
         {
@@ -93,18 +86,15 @@ namespace apbd3.Controllers
             using (var com = new SqlCommand())
 
             {
-
                 com.Connection = client;
 
                 com.CommandText = "select Enrollment.IdEnrollment,Enrollment.Semester,Enrollment.IdStudy,Enrollment.StartDate from Enrollment,Student where Student.IdEnrollment=Enrollment.IdEnrollment and Student.IndexNumber=@index";
                 com.Parameters.AddWithValue("index", index);
                 client.Open();
                 var dr = com.ExecuteReader();
-
-
+                
                 lista2 = new List<Models.Enrollment>();
-
-
+                
                 while (dr.Read())
                 {
                     var st = new Models.Enrollment();
@@ -120,35 +110,27 @@ namespace apbd3.Controllers
             }
             return Ok(lista2);
         }
-
-
+        
         [HttpPost]
-
-
+        
         public IActionResult createStudent(Models.Student student)
         {
             student.IndexNumber = $"s{new Random().Next(1, 20000)}";
             return Ok(student);
         }
-
-
-
+        
         [HttpPut("{Id}")]
 
 
         public IActionResult putStudent(int Id)
-
-
+        
         {
-
             Models.Student student = new Models.Student();
             student.IdStudent = Id;
             student.IndexNumber = $"s{new Random().Next(1, 20000)}";
             return Ok("Update complete");
         }
-
-
-
+        
         [HttpDelete("{Id}")]
 
 
@@ -158,23 +140,17 @@ namespace apbd3.Controllers
 
             return Ok("Delete complete");
         }
-
-
-
-
+        
         [HttpPost("entity/change")]
 
 
         public IActionResult updateStudentE(Entities.Student student)
         {
-
-
-
+            
             var zmiana = new Entities.Student();
 
             zmiana.IndexNumber = student.IndexNumber;
-
-
+            
             _StudentContext.Student.Attach(zmiana);
 
             zmiana.IndexNumber = student.IndexNumber;
@@ -188,44 +164,32 @@ namespace apbd3.Controllers
 
             return Ok(student);
         }
-
-
-
+        
         [HttpPut("entity/add")]
 
 
         public IActionResult putStudent(Entities.Student student)
-
-
+        
         {
-
             _StudentContext.Add<Entities.Student>(student);
 
             _StudentContext.SaveChanges();
             
             return Ok(student);
         }
-
-
-
-
+        
         [HttpDelete("entity/del/{index}")]
 
 
         public IActionResult delStudent(string index)
-
-
+        
         {
-
-
             var zmiana = new Entities.Student();
 
             zmiana.IndexNumber = index;
 
             _StudentContext.Student.Attach(zmiana);
-
-
-
+            
             _StudentContext.Remove(zmiana);
 
             _StudentContext.SaveChanges();
@@ -234,8 +198,4 @@ namespace apbd3.Controllers
         }
 
     }
-
-
-
-
 }

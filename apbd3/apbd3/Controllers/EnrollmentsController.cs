@@ -24,29 +24,21 @@ namespace apbd3.Controllers
     [Authorize(Roles = "employee")]
     public class EnrollmentsController : ControllerBase
     {
-
-
         readonly IStudentsDbService _service;
 
         public IConfiguration Configuration { get; set; }
-
-
+        
         public EnrollmentsController(IStudentsDbService service, IConfiguration configuration)
         {
             _service = service;
 
             Configuration = configuration;
-
-
+            
         }
 
         [HttpPost]
-        
         public IActionResult AddStudent(Models.Student student)
         {
-
-
-
             var enrollment = _service.EnrollStudent(student);
 
             if (enrollment != null)
@@ -65,15 +57,11 @@ namespace apbd3.Controllers
         [HttpGet]
 
         [AllowAnonymous]
-
-
+        
         public IActionResult Login(LoginRequest login)
         {
 
             var response = _service.Login(login);
-
-
-
             var Cliams = new[] {
 
                 new Claim(ClaimTypes.NameIdentifier,response.login),
@@ -82,9 +70,7 @@ namespace apbd3.Controllers
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["SecretKey"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-
-
+            
             var token = new JwtSecurityToken(
 
                 issuer: "Oskar",
@@ -99,14 +85,9 @@ namespace apbd3.Controllers
 
 
             _service.SaveToken(response.login, response.name, refreshToken.ToString());
-
-
-
-
+            
             return Ok(new
             {
-
-
                 token = new JwtSecurityTokenHandler().WriteToken(token),
                 refreshToken
 
@@ -119,18 +100,14 @@ namespace apbd3.Controllers
         [HttpPost("promotions")]
         public IActionResult promoteStudent(PromoteRequest promotion)
         {
-
-
             var enrollment = _service.PromoteStudents(promotion);
-
-
+            
             if (enrollment != null)
             {
 
                 return new ObjectResult(enrollment) { StatusCode = StatusCodes.Status201Created };
             }
-
-
+            
             else
             {
                 return BadRequest("not found");
@@ -138,12 +115,7 @@ namespace apbd3.Controllers
 
 
         }
-
-
-
-
-
-
+        
         [AllowAnonymous]
         [HttpPost("refresh-token/{token}")]
 
@@ -151,14 +123,10 @@ namespace apbd3.Controllers
         public IActionResult RefreshToken(string token)
 
         {
-
-
             var data = _service.CheckToken(token);
 
             if(data!=null){
-
-
-
+                
                 var Cliams = new[] {
 
                 new Claim(ClaimTypes.NameIdentifier,data.login),
@@ -167,9 +135,7 @@ namespace apbd3.Controllers
 
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["SecretKey"]));
                 var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-
-
+                
                 var accestoken = new JwtSecurityToken(
 
                     issuer: "Oskar",
@@ -177,36 +143,24 @@ namespace apbd3.Controllers
                     claims: Cliams,
                     expires: DateTime.Now.AddMinutes(10),
                     signingCredentials: creds
-
-                    );
+                );
 
                 var refreshToken = Guid.NewGuid();
-
-
+                
                 _service.SaveToken(data.login, data.name, refreshToken.ToString());
-
-
-
-
+                
                 return Ok(new
                 {
-
-
                     token = new JwtSecurityTokenHandler().WriteToken(accestoken),
                     refreshToken
 
                 });
-
-
-
+                
             }
             else
             {
-
                 return BadRequest("Invalid Tokens");
             }
-
-
         }
     }
 }

@@ -26,9 +26,7 @@ namespace apbd3.Services
         }
         public EnrollmentResponse EnrollStudent(Models.Student student)
         {
-        
-
-
+            
             
                 if (student.IndexNumber == null || student.Firstname == null || student.Lastname == null || student.BirthDate == null || student.Studies == null)
                 {
@@ -45,11 +43,7 @@ namespace apbd3.Services
                     //com.Transaction = tran;
                     //com.CommandText = "select * from Studies where Name=@index";
                     //com.Parameters.AddWithValue("index", student.Studies);
-
-
-
-
-
+                    
                     var result = _context.Studies.Select(e => new {
 
 
@@ -64,9 +58,7 @@ namespace apbd3.Services
                     {
                         return null;
                     }
-
-
-
+                    
                     int idStudies = result.Select(e => e.IdStudy).First();
 
 
@@ -103,8 +95,7 @@ namespace apbd3.Services
                             Semester = 1,
                             IdStudy = idStudies,
                             StartDate = DateTime.Now
-
-
+                            
                         };
 
                         _context.Enrollment.Add(newEnroll);
@@ -126,12 +117,7 @@ namespace apbd3.Services
 
                         result1 = fromEnr.Select(e => e.IdEnrollment).First();
                     }
-
-
-
-
-
-
+                    
                 var dont2 = _context.Student.Select(e => new { e.IndexNumber }).Where(d => d.IndexNumber.Equals(student.IndexNumber)).FirstOrDefault();
 
                 //com.CommandText = "SELECT * FROM Student WHERE IndexNumber =@indexs";
@@ -144,9 +130,7 @@ namespace apbd3.Services
                         return null;
 
                     }
-
-
-
+                
                     //com.Parameters.AddWithValue("IdStuds", idStudies);
 
                     _context.Add(new Entities.Student()
@@ -182,22 +166,12 @@ namespace apbd3.Services
 
 
                     var enrollment = new Models.Enrollment();
-
-                    
-                    
-                   
                     
                         enrollment.Idenrollment = hello.First().IdEnrollment;
                         enrollment.semester = hello.First().Semester;
                         enrollment.IdStudy = hello.First().IdStudy;
                       enrollment.StartDate   =  hello.First().StartDate.ToString();
-                       
-
-                    
-
-                  
-
-
+                      
                     var er = new EnrollmentResponse(enrollment);
 
                     return er;
@@ -247,14 +221,9 @@ namespace apbd3.Services
             using (var com = new SqlCommand())
 
             {
-
-
-               
-
-
+                
                 com.CommandText = "select * from Salt where saltID=@id";
-
-
+                
                 com.Parameters.AddWithValue("id", 1);
 
                 client.Open();
@@ -279,9 +248,7 @@ namespace apbd3.Services
                 com.Parameters.AddWithValue("pass", loginRequest.password);
 
                 com.Parameters.AddWithValue("index", loginRequest.login);
-
-
-
+                
                 dr.Close();
 
                 var dr2 = com.ExecuteReader();
@@ -295,11 +262,9 @@ namespace apbd3.Services
                 response.login = dr2["IndexNumber"].ToString();
 
                 response.name = dr2["LastName"].ToString();
-
-
+                
                 return response;
-
-
+                
             }
 
         }
@@ -315,8 +280,7 @@ namespace apbd3.Services
                 //client.Open();
                 //com.Connection = client;
 
-
-
+                
                 var result = _context.Enrollment.Join(_context.Studies, p => p.IdStudy, v => v.IdStudy, (p, v) => new { p, v }).Where(d => d.p.Semester == request.Semester && d.v.Name.Equals(request.Studies)).FirstOrDefault();
 
                 //com.CommandText = "select * from Enrollment,Studies where Enrollment.IdStudy=Studies.IdStudy and Enrollment.semester=@semester and Studies.Name=@Studies";
@@ -346,10 +310,7 @@ namespace apbd3.Services
 
 
                 //com.CommandType = System.Data.CommandType.Text;
-
-
-               
-
+                
                      var result3 = _context.Enrollment.Join(_context.Studies, p => p.IdStudy, v => v.IdStudy, (p, v) => new { p, v }).Where(d => d.p.Semester == request.Semester+1 && d.v.Name.Equals(request.Studies)).FirstOrDefault();
 
 
@@ -379,7 +340,6 @@ namespace apbd3.Services
         {
             try
             {
-
                 using (StreamWriter w = File.AppendText("C:\\Users\\virion\\Desktop\\apbd3\\apbd3\\apbd3\\apbd3\\Log.txt"))
                 {
 
@@ -388,7 +348,6 @@ namespace apbd3.Services
 
                     w.Flush();
                     w.Close();
-
                 }
 
             }
@@ -396,9 +355,7 @@ namespace apbd3.Services
             {
 
                 Console.WriteLine(e.Message);
-
-
-
+                
             }
         }
 
@@ -427,14 +384,11 @@ namespace apbd3.Services
 
         public TokenResponse CheckToken(string token) 
         {
-
-
-
+            
             using (var client = new SqlConnection("Data Source=db-mssql.pjwstk.edu.pl;Initial Catalog=2019SBD;Integrated Security=True"))
             using (var com = new SqlCommand())
 
             {
-
                 client.Open();
                 com.Connection = client;
 
@@ -448,16 +402,12 @@ namespace apbd3.Services
 
                 if (!dr.Read())
                 {
-
-
                     return null;
                 }
                 else
 
                 {
-
                     var response = new TokenResponse();
-
                     response.login = dr["Login"].ToString();
                     response.name = dr["Name"].ToString();
 
@@ -466,8 +416,7 @@ namespace apbd3.Services
                 } 
 
             }
-
-
+            
         }
     }
 } 

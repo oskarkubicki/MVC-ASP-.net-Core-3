@@ -8,11 +8,8 @@ namespace apbd3.DTO
 {
     public class EnrollmentResponse
     {
-
-
         public EnrollmentResponse(Enrollment enrollment)
         {
-
             Idenrollment = enrollment.Idenrollment;
             semester = enrollment.semester;
             IdStudy = enrollment.IdStudy;

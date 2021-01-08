@@ -11,7 +11,6 @@ namespace apbd3.Middlewares
 {
     public class LoggingMiddleware
     {
-
         private readonly RequestDelegate _next;
 
         public LoggingMiddleware(RequestDelegate next)
@@ -24,7 +23,6 @@ namespace apbd3.Middlewares
             string log = "";
 
             if (httpContext.Request != null)
-
             {
                 string path = httpContext.Request.Path;
                 string method = httpContext.Request.Method;
@@ -33,30 +31,24 @@ namespace apbd3.Middlewares
 
 
                 httpContext.Request.EnableBuffering();
-
                 
-
-
                 using (StreamReader reader = new StreamReader(httpContext.Request.Body, Encoding.UTF8, true, 1024, true))
                 {
                     bodyStr = await reader.ReadToEndAsync();
 
                     httpContext.Request.Body.Position = 0;
-
-
+                    
                 }
-                                            log = path + " " + method + " " + queryString + " " + bodyStr + "\n";
+                log = path + " " + method + " " + queryString + " " + bodyStr + "\n";
 
-                                            service.SaveLogData(log);
+                service.SaveLogData(log);
 
             }
-
             if (_next != null) { 
                 
                 await _next(httpContext);
                 }
-      
-            }
+        }
         }
             
     }
