@@ -4,6 +4,7 @@ using System.Linq;
 using apbd3.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using Enrollment = apbd3.Models.Enrollment;
 using Student = apbd3.Models.Student;
 
@@ -14,22 +15,24 @@ namespace apbd3.Controllers
     [Route("api/students")]
     public class StudentsController : ControllerBase
     {
-        private readonly StudentContext _StudentContext;
+        private readonly StudentContext _studentContext;
+        private List<Enrollment> _enrollments;
 
-        private List<Student> lista;
-        private List<Enrollment> lista2;
+        private List<Student> _students;
 
-        public StudentsController(StudentContext student)
-
+        public StudentsController(StudentContext student, IConfiguration configuration)
         {
-            _StudentContext = student;
+            _studentContext = student;
+            Configuration = configuration;
         }
+
+        private IConfiguration Configuration { get; }
 
         [HttpGet("entity")]
         public IActionResult GetStudentsE()
 
         {
-            var students = _StudentContext.Student.ToList();
+            var students = _studentContext.Student.ToList();
             return Ok(students);
         }
 
@@ -37,29 +40,25 @@ namespace apbd3.Controllers
         public IActionResult GetStudents()
         {
             using (var client =
-                new SqlConnection(
-                    "Data Source=db-mssql.pjwstk.edu.pl;Initial Catalog=2019SBD;Integrated Security=True"))
+                new SqlConnection(Configuration.GetConnectionString("DefaultConnectionString")
+                ))
             using (var com = new SqlCommand())
 
             {
                 com.Connection = client;
                 com.CommandText =
-                    @"    select    FirstName,
-                                LastName,
-                                BirthDate,
-                                Name,
-                                Semester
-                        from 
-                         Student,
-                         Studies,
-                         Enrollment
-                        where 
-                          Student.IdEnrollment=Enrollment.IdEnrollment and Enrollment.IdStudy=Studies.IdStudy";
+                    @"select FirstName,
+                            LastName,
+                            BirthDate,
+                            Name,
+                            Semester
+                    from Student,Studies,Enrollment
+                    where Student.IdEnrollment=Enrollment.IdEnrollment and Enrollment.IdStudy=Studies.IdStudy";
 
                 client.Open();
                 var dr = com.ExecuteReader();
 
-                lista = new List<Student>();
+                _students = new List<Student>();
 
                 while (dr.Read())
                 {
@@ -70,11 +69,11 @@ namespace apbd3.Controllers
                     st.Studies = dr["Name"].ToString();
                     st.Semester = dr["Semester"].ToString();
 
-                    lista.Add(st);
+                    _students.Add(st);
                 }
             }
 
-            return Ok(lista);
+            return Ok(_students);
         }
 
         [HttpGet("secret/{index}")]
@@ -82,19 +81,24 @@ namespace apbd3.Controllers
         {
             using (var client =
                 new SqlConnection(
-                    "Data Source=db-mssql.pjwstk.edu.pl;Initial Catalog=2019SBD;Integrated Security=True"))
+                    Configuration.GetConnectionString("DefaultConnectionString")))
             using (var com = new SqlCommand())
 
             {
                 com.Connection = client;
-
                 com.CommandText =
-                    "select Enrollment.IdEnrollment,Enrollment.Semester,Enrollment.IdStudy,Enrollment.StartDate from Enrollment,Student where Student.IdEnrollment=Enrollment.IdEnrollment and Student.IndexNumber=@index";
+                    @"select Enrollment.IdEnrollment,
+                    Enrollment.Semester,
+                    Enrollment.IdStudy,
+                    Enrollment.StartDate
+                     from Enrollment,Student 
+                     where Student.IdEnrollment=Enrollment.IdEnrollment 
+                     and Student.IndexNumber=@index";
                 com.Parameters.AddWithValue("index", index);
                 client.Open();
                 var dr = com.ExecuteReader();
 
-                lista2 = new List<Enrollment>();
+                _enrollments = new List<Enrollment>();
 
                 while (dr.Read())
                 {
@@ -105,12 +109,11 @@ namespace apbd3.Controllers
                         IdStudy = Convert.ToInt32(dr["IdStudy"]),
                         StartDate = dr["StartDate"].ToString()
                     };
-
-                    lista2.Add(st);
+                    _enrollments.Add(st);
                 }
             }
 
-            return Ok(lista2);
+            return Ok(_enrollments);
         }
 
         [HttpPost]
@@ -130,13 +133,6 @@ namespace apbd3.Controllers
             return Ok("Update complete");
         }
 
-        [HttpDelete("{Id}")]
-        public IActionResult DeleteStudent(int Id)
-
-        {
-            return Ok("Delete complete");
-        }
-
         [HttpPost("entity/change")]
         public IActionResult UpdateStudentE(Entities.Student student)
         {
@@ -144,7 +140,7 @@ namespace apbd3.Controllers
 
             zmiana.IndexNumber = student.IndexNumber;
 
-            _StudentContext.Student.Attach(zmiana);
+            _studentContext.Student.Attach(zmiana);
 
             zmiana.IndexNumber = student.IndexNumber;
             zmiana.FirstName = student.FirstName;
@@ -152,7 +148,7 @@ namespace apbd3.Controllers
             zmiana.BirthDate = student.BirthDate;
             zmiana.IdEnrollment = student.IdEnrollment;
 
-            _StudentContext.SaveChanges();
+            _studentContext.SaveChanges();
 
             return Ok(student);
         }
@@ -161,9 +157,8 @@ namespace apbd3.Controllers
         public IActionResult PutStudent(Entities.Student student)
 
         {
-            _StudentContext.Add(student);
-
-            _StudentContext.SaveChanges();
+            _studentContext.Add(student);
+            _studentContext.SaveChanges();
 
             return Ok(student);
         }
@@ -176,9 +171,9 @@ namespace apbd3.Controllers
             {
                 IndexNumber = index
             };
-            _StudentContext.Student.Attach(zmiana);
-            _StudentContext.Remove(zmiana);
-            _StudentContext.SaveChanges();
+            _studentContext.Student.Attach(zmiana);
+            _studentContext.Remove(zmiana);
+            _studentContext.SaveChanges();
 
             return Ok("deleted student");
         }

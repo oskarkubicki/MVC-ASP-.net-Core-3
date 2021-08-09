@@ -1,26 +1,26 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace apbd3.Entities
 {
     public class StudentContext : DbContext
     {
-        public StudentContext(DbContextOptions<StudentContext> options)
+        public StudentContext(DbContextOptions<StudentContext> options, IConfiguration configuration)
             : base(options)
         {
+            Configuration = configuration;
         }
 
         public virtual DbSet<Enrollment> Enrollment { get; set; }
         public virtual DbSet<Student> Student { get; set; }
         public virtual DbSet<Studies> Studies { get; set; }
+        public IConfiguration Configuration { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
-            {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http: //go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Data Source=db-mssql;Initial Catalog=s19732;Integrated Security=True;");
-            }
+                optionsBuilder.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString"));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

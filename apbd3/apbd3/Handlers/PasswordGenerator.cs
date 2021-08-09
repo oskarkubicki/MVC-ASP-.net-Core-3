@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
 namespace apbd3.Handlers
 {
-    public class PasswordGenerator
+    public static class PasswordGenerator
     {
         public static string Create(string value, string salt)
 
@@ -20,17 +20,13 @@ namespace apbd3.Handlers
             return Convert.ToBase64String(valueBytes);
         }
 
-
         public static string CreateSalt()
-
 
         {
             var randomBytes = new byte[128 / 8];
-            using (var generator = RandomNumberGenerator.Create())
-            {
-                generator.GetBytes(randomBytes);
-                return Convert.ToBase64String(randomBytes);
-            }
+            using var generator = RandomNumberGenerator.Create();
+            generator.GetBytes(randomBytes);
+            return Convert.ToBase64String(randomBytes);
         }
     }
 }

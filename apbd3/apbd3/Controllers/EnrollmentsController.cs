@@ -90,7 +90,7 @@ namespace apbd3.Controllers
             var data = _service.CheckToken(token);
 
             if (data == null) return BadRequest("Invalid Tokens");
-            var cliams = new[]
+            var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, data.Login),
                 new Claim(ClaimTypes.Name, data.Name),
@@ -100,10 +100,10 @@ namespace apbd3.Controllers
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["SecretKey"]));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var accestoken = new JwtSecurityToken(
+            var accessToken = new JwtSecurityToken(
                 "Oskar",
                 "employee",
-                cliams,
+                claims,
                 expires: DateTime.Now.AddMinutes(10),
                 signingCredentials: credentials
             );
@@ -114,7 +114,7 @@ namespace apbd3.Controllers
 
             return Ok(new
             {
-                token = new JwtSecurityTokenHandler().WriteToken(accestoken),
+                token = new JwtSecurityTokenHandler().WriteToken(accessToken),
                 refreshToken
             });
         }

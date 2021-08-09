@@ -25,13 +25,11 @@ namespace apbd3
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<StudentContext>(e =>
                 e.UseSqlServer(Configuration["ConnectionStrings:DefaultConnectionString"]));
             services.AddAuthorization();
-
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
@@ -41,11 +39,9 @@ namespace apbd3
                     ValidIssuer = "Oskar",
                     ValidAudience = "employee",
                     ValidateLifetime = true,
-
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["SecretKey"]))
                 };
             });
-
 
             services.AddTransient<IStudentsDbService, SqlServerStudentDbService>();
             services.AddControllers();
@@ -54,19 +50,13 @@ namespace apbd3
                 c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "Student API", Version = "v1"}); });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IStudentsDbService service)
         {
             if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
 
             app.UseSwagger();
-
             app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Student API V1"); });
-
-
             app.UseMiddleware<LoggingMiddleware>();
-
-
             app.UseWhen(context => context.Request.Path.ToString().Contains("secret"), app =>
                 app.Use(async (context, next) =>
                 {
@@ -78,8 +68,7 @@ namespace apbd3
                     }
 
                     var index = context.Request.Headers["Index"].ToString();
-                    //stateless
-                    //check in db if this index exists
+
                     var st = service.GetStudentByIndexAsync(index);
                     if (st == null)
                     {
@@ -88,18 +77,12 @@ namespace apbd3
                         return;
                     }
 
-                    await next(); //calls the next middleware
+                    await next();
                 }));
 
-
             app.UseRouting();
-
-            // app.UseAuthorization(); 
-
             app.UseAuthentication();
-
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }

@@ -1,13 +1,5 @@
 ﻿{
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information",
-      "Microsoft": "Warning",
-      "Microsoft.Hosting.Lifetime": "Information"
-    }
-  },
-  "AllowedHosts": "*",
-  "ConnectionStrings": {
-    "DefaultConnectionString": "Data Source=db-mssql;Initial Catalog=s19732;Integrated Security=True"
+  "HelloWorldApp": {
+    "ConnectionString": "Data Source=db-mssql;Initial Catalog=s19732;Integrated Security=True"
   }
 }

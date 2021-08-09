@@ -8,6 +8,7 @@ using apbd3.Entities;
 using apbd3.Handlers;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Enrollment = apbd3.Models.Enrollment;
 using Student = apbd3.Models.Student;
 
@@ -17,9 +18,12 @@ namespace apbd3.Services
     {
         private readonly StudentContext _context;
 
-        public SqlServerStudentDbService(StudentContext context)
+        public IConfiguration Configuration { get; set; }
+
+        public SqlServerStudentDbService(StudentContext context, IConfiguration configuration)
         {
             _context = context;
+            Configuration = configuration;
         }
 
         public EnrollmentResponse EnrollStudent(Student student)
@@ -35,16 +39,21 @@ namespace apbd3.Services
                 e.Name
             }).Where(d => d.Name.Equals(student.Studies));
 
-
             var idStudies = result.Select(e => e.IdStudy).First();
-            var fromEnr = _context.Enrollment.Select(e => e).Where(e => e.Semester == 1 && e.IdStudy == idStudies);
+            var fromEnr = _context.Enrollment
+                .Select(e => e)
+                .Where(e => e.Semester == 1 && e.IdStudy == idStudies);
 
             {
-                result1 = fromEnr.Select(e => e.IdEnrollment).First();
+                result1 = fromEnr
+                    .Select(e => e.IdEnrollment)
+                    .First();
             }
 
-            var dont2 = _context.Student.Select(e => new {e.IndexNumber})
-                .Where(d => d.IndexNumber.Equals(student.IndexNumber)).FirstOrDefault();
+            var dont2 = _context.Student
+                .Select(e => new {e.IndexNumber})
+                .FirstOrDefault(d => d.IndexNumber
+                    .Equals(student.IndexNumber));
 
             if (dont2 != null) return null;
 
@@ -59,10 +68,12 @@ namespace apbd3.Services
 
             _context.SaveChanges();
 
-            var hello = _context.Enrollment.Select(e => e).Where(e =>
+            var hello = _context.Enrollment.Select(e => e)
+                .Where(e =>
                 e.IdStudy == idStudies && e.Semester == 1 && e.StartDate ==
-                _context.Enrollment.Where(e => e.IdStudy == idStudies).Max(e => e.StartDate));
-
+                _context.Enrollment
+                    .Where(e => e.IdStudy == idStudies)
+                    .Max(e => e.StartDate));
 
             var enrollment = new Enrollment
             {
@@ -73,7 +84,6 @@ namespace apbd3.Services
             };
 
             var er = new EnrollmentResponse(enrollment);
-
             return er;
         }
 
@@ -81,7 +91,7 @@ namespace apbd3.Services
         {
             await using var client =
                 new SqlConnection(
-                    "Data Source=db-mssql.pjwstk.edu.pl;Initial Catalog=2019SBD;Integrated Security=True");
+                    Configuration.GetConnectionString("DefaultConnectionString"));
             await using var com = new SqlCommand();
             com.CommandText = "Select * from student where IndexNumber=@index ";
             com.Parameters.AddWithValue("index", index);
@@ -95,7 +105,6 @@ namespace apbd3.Services
                 Lastname = reader["LastName"].ToString(),
                 IdStudent = (int) reader["IdEnrollment"]
             };
-
             return student;
         }
 
@@ -103,7 +112,7 @@ namespace apbd3.Services
         {
             using var client =
                 new SqlConnection(
-                    "Data Source=db-mssql.pjwstk.edu.pl;Initial Catalog=2019SBD;Integrated Security=True");
+                   Configuration.GetConnectionString("DefaultConnectionString"));
             using var com = new SqlCommand();
             com.CommandText = "select * from Salt where saltID=@id";
 
@@ -114,7 +123,6 @@ namespace apbd3.Services
             var dr = com.ExecuteReader();
 
             dr.Read();
-
             var saltc = dr["salt"].ToString();
 
             loginRequest.Password = PasswordGenerator.Create(loginRequest.Password, saltc);
@@ -137,26 +145,23 @@ namespace apbd3.Services
         public PromoteResponse PromoteStudents(PromoteRequest request)
         {
             {
-                //client.Open();
-                //com.Connection = client;
-
-
                 var result = _context.Enrollment
-                    .Join(_context.Studies, p => p.IdStudy, v => v.IdStudy, (p, v) => new {p, v})
-                    .Where(d => d.p.Semester == request.Semester && d.v.Name.Equals(request.Studies)).FirstOrDefault();
-
+                    .Join(_context.Studies, p => p.IdStudy, v => v.IdStudy, (p, v) => new {p, v}).FirstOrDefault(d =>
+                        d.p.Semester == request.Semester && d.v.Name.Equals(request.Studies));
 
                 if (result == null) return null;
 
                 var name = new SqlParameter("@name", request.Studies);
                 var semester = new SqlParameter("@semester", request.Semester);
 
-                var list1 = _context.Database.ExecuteSqlCommand("exec Promotion @name, @semester", name, semester);
-
+                var list1 = _context
+                    .Database
+                    .ExecuteSqlCommand("exec Promotion @name, @semester", name, semester);
 
                 var result3 = _context.Enrollment
-                    .Join(_context.Studies, p => p.IdStudy, v => v.IdStudy, (p, v) => new {p, v}).Where(d =>
-                        d.p.Semester == request.Semester + 1 && d.v.Name.Equals(request.Studies)).FirstOrDefault();
+                    .Join(_context.Studies, p => p.IdStudy, v => v.IdStudy, (p, v) => new {p, v})
+                    .FirstOrDefault(d =>
+                        d.p.Semester == request.Semester + 1 && d.v.Name.Equals(request.Studies));
 
                 var enrollment = new Enrollment();
 
@@ -178,7 +183,6 @@ namespace apbd3.Services
                 using var w =
                     File.AppendText("C:\\Users\\virion\\Desktop\\apbd3\\apbd3\\apbd3\\apbd3\\Log.txt");
                 w.Write(data);
-
                 w.Flush();
                 w.Close();
             }
@@ -192,7 +196,7 @@ namespace apbd3.Services
         {
             using var client =
                 new SqlConnection(
-                    "Data Source=db-mssql.pjwstk.edu.pl;Initial Catalog=2019SBD;Integrated Security=True");
+                    Configuration.GetConnectionString("DefaultConnectionString"));
             using var com = new SqlCommand();
             client.Open();
             com.Connection = client;
@@ -206,28 +210,25 @@ namespace apbd3.Services
 
         public TokenResponse CheckToken(string token)
         {
-            using (var client =
+            using var client =
                 new SqlConnection(
-                    "Data Source=db-mssql.pjwstk.edu.pl;Initial Catalog=2019SBD;Integrated Security=True"))
-            using (var com = new SqlCommand())
+                    Configuration.GetConnectionString("DefaultConnectionString"));
+            using var com = new SqlCommand();
+            client.Open();
+            com.Connection = client;
 
-            {
-                client.Open();
-                com.Connection = client;
+            com.CommandText = "select * from RefreshToken where RefreshToken.RefreshToken=@token ";
+            com.Parameters.AddWithValue("token", token);
 
-                com.CommandText = "select * from RefreshToken where RefreshToken.RefreshToken=@token ";
-                com.Parameters.AddWithValue("token", token);
+            var dr = com.ExecuteReader();
 
-                var dr = com.ExecuteReader();
+            if (!dr.Read()) return null;
 
-                if (!dr.Read()) return null;
+            var response = new TokenResponse();
+            response.Login = dr["Login"].ToString();
+            response.Name = dr["Name"].ToString();
 
-                var response = new TokenResponse();
-                response.Login = dr["Login"].ToString();
-                response.Name = dr["Name"].ToString();
-
-                return response;
-            }
+            return response;
         }
     }
 }

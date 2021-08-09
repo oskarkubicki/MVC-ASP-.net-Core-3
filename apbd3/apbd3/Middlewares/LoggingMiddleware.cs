@@ -26,7 +26,6 @@ namespace apbd3.Middlewares
                 var queryString = httpContext.Request.QueryString.ToString();
                 var bodyStr = "";
 
-
                 httpContext.Request.EnableBuffering();
 
                 using (var reader =
