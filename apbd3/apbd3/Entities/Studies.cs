@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace apbd3.Entities
 {
-    public partial class Studies
+    public class Studies
     {
         public Studies()
         {
@@ -12,7 +11,6 @@ namespace apbd3.Entities
 
         public int IdStudy { get; set; }
         public string Name { get; set; }
-
         public virtual ICollection<Enrollment> Enrollment { get; set; }
     }
 }

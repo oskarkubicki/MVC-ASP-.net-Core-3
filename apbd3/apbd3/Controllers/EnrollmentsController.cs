@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using apbd3.DTO;
-using apbd3.Entities;
 using apbd3.Models;
 using apbd3.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -20,150 +15,108 @@ namespace apbd3.Controllers
 {
     [Route("api/enrollment")]
     [ApiController]
-
     [Authorize(Roles = "employee")]
     public class EnrollmentsController : ControllerBase
     {
-        readonly IStudentsDbService _service;
+        private readonly IStudentsDbService _service;
 
-        public IConfiguration Configuration { get; set; }
-        
         public EnrollmentsController(IStudentsDbService service, IConfiguration configuration)
         {
             _service = service;
-
             Configuration = configuration;
-            
         }
 
+        public IConfiguration Configuration { get; set; }
+
         [HttpPost]
-        public IActionResult AddStudent(Models.Student student)
+        public IActionResult AddStudent(Student student)
         {
             var enrollment = _service.EnrollStudent(student);
 
-            if (enrollment != null)
-            {
-                return new ObjectResult(enrollment) { StatusCode = StatusCodes.Status201Created };
-
-            }
-            else
-
-            {
-                return BadRequest("bad request");
-            }
-
+            return enrollment != null
+                ? new ObjectResult(enrollment) {StatusCode = StatusCodes.Status201Created}
+                : BadRequest("bad request");
         }
 
         [HttpGet]
-
         [AllowAnonymous]
-        
         public IActionResult Login(LoginRequest login)
         {
-
             var response = _service.Login(login);
-            var Cliams = new[] {
-
-                new Claim(ClaimTypes.NameIdentifier,response.login),
-                new Claim(ClaimTypes.Name,response.name),
-                new Claim(ClaimTypes.Role,"employee") };
+            var cliams = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, response.Login),
+                new Claim(ClaimTypes.Name, response.Name),
+                new Claim(ClaimTypes.Role, "employee")
+            };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["SecretKey"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
             var token = new JwtSecurityToken(
-
-                issuer: "Oskar",
-                audience: "employee",
-                claims: Cliams,
+                "Oskar",
+                "employee",
+                cliams,
                 expires: DateTime.Now.AddMinutes(10),
-                signingCredentials: creds
-
-                );
+                signingCredentials: credentials
+            );
 
             var refreshToken = Guid.NewGuid();
 
+            _service.SaveToken(response.Login, response.Name, refreshToken.ToString());
 
-            _service.SaveToken(response.login, response.name, refreshToken.ToString());
-            
             return Ok(new
             {
                 token = new JwtSecurityTokenHandler().WriteToken(token),
                 refreshToken
-
             });
-
         }
 
         [AllowAnonymous]
-
         [HttpPost("promotions")]
-        public IActionResult promoteStudent(PromoteRequest promotion)
+        public IActionResult PromoteStudent(PromoteRequest promotion)
         {
             var enrollment = _service.PromoteStudents(promotion);
-            
-            if (enrollment != null)
-            {
 
-                return new ObjectResult(enrollment) { StatusCode = StatusCodes.Status201Created };
-            }
-            
-            else
-            {
-                return BadRequest("not found");
-            }
-
-
+            return enrollment != null
+                ? new ObjectResult(enrollment) {StatusCode = StatusCodes.Status201Created}
+                : BadRequest("not found");
         }
-        
+
         [AllowAnonymous]
         [HttpPost("refresh-token/{token}")]
-
-
         public IActionResult RefreshToken(string token)
-
         {
             var data = _service.CheckToken(token);
 
-            if(data!=null){
-                
-                var Cliams = new[] {
-
-                new Claim(ClaimTypes.NameIdentifier,data.login),
-                new Claim(ClaimTypes.Name,data.name),
-                new Claim(ClaimTypes.Role,"employee") };
-
-                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["SecretKey"]));
-                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-                
-                var accestoken = new JwtSecurityToken(
-
-                    issuer: "Oskar",
-                    audience: "employee",
-                    claims: Cliams,
-                    expires: DateTime.Now.AddMinutes(10),
-                    signingCredentials: creds
-                );
-
-                var refreshToken = Guid.NewGuid();
-                
-                _service.SaveToken(data.login, data.name, refreshToken.ToString());
-                
-                return Ok(new
-                {
-                    token = new JwtSecurityTokenHandler().WriteToken(accestoken),
-                    refreshToken
-
-                });
-                
-            }
-            else
+            if (data == null) return BadRequest("Invalid Tokens");
+            var cliams = new[]
             {
-                return BadRequest("Invalid Tokens");
-            }
+                new Claim(ClaimTypes.NameIdentifier, data.Login),
+                new Claim(ClaimTypes.Name, data.Name),
+                new Claim(ClaimTypes.Role, "employee")
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["SecretKey"]));
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var accestoken = new JwtSecurityToken(
+                "Oskar",
+                "employee",
+                cliams,
+                expires: DateTime.Now.AddMinutes(10),
+                signingCredentials: credentials
+            );
+
+            var refreshToken = Guid.NewGuid();
+
+            _service.SaveToken(data.Login, data.Name, refreshToken.ToString());
+
+            return Ok(new
+            {
+                token = new JwtSecurityTokenHandler().WriteToken(accestoken),
+                refreshToken
+            });
         }
     }
 }
-
-
-

@@ -1,8 +1,4 @@
 ﻿using apbd3.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace apbd3.DTO
 {
@@ -10,21 +6,15 @@ namespace apbd3.DTO
     {
         public EnrollmentResponse(Enrollment enrollment)
         {
-            Idenrollment = enrollment.Idenrollment;
-            semester = enrollment.semester;
+            Idenrollment = enrollment.IdEnrollment;
+            Semester = enrollment.Semester;
             IdStudy = enrollment.IdStudy;
-
             StartDate = enrollment.StartDate;
         }
 
-        public int Idenrollment { get; set; }
-
-        public int semester { get; set; }
-
-        public int IdStudy { get; set; }
-
-        public string StartDate { get; set; }
-
-
+        private int Idenrollment { get; }
+        private int Semester { get; }
+        private int IdStudy { get; }
+        private string StartDate { get; }
     }
 }

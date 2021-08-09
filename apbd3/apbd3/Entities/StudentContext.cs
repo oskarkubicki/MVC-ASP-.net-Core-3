@@ -1,15 +1,10 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace apbd3.Entities
 {
-    public partial class StudentContext : DbContext
+    public class StudentContext : DbContext
     {
-        public StudentContext()
-        {
-        }
-
         public StudentContext(DbContextOptions<StudentContext> options)
             : base(options)
         {
@@ -23,7 +18,7 @@ namespace apbd3.Entities
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http: //go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
                 optionsBuilder.UseSqlServer("Data Source=db-mssql;Initial Catalog=s19732;Integrated Security=True;");
             }
         }
@@ -34,9 +29,7 @@ namespace apbd3.Entities
             {
                 entity.HasKey(e => e.IdEnrollment)
                     .HasName("Enrollment_pk");
-
                 entity.Property(e => e.IdEnrollment).ValueGeneratedNever();
-
                 entity.Property(e => e.StartDate).HasColumnType("date");
 
                 entity.HasOne(d => d.IdStudyNavigation)
@@ -51,7 +44,9 @@ namespace apbd3.Entities
                 entity.HasKey(e => e.IndexNumber)
                     .HasName("Student_pk");
 
-                entity.Property(e => e.IndexNumber).HasMaxLength(100);
+                entity
+                    .Property(e => e.IndexNumber)
+                    .HasMaxLength(100);
 
                 entity.Property(e => e.BirthDate).HasColumnType("date");
 
@@ -85,6 +80,9 @@ namespace apbd3.Entities
             OnModelCreatingPartial(modelBuilder);
         }
 
-        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+        private void OnModelCreatingPartial(ModelBuilder modelBuilder)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -1,11 +1,8 @@
-﻿using apbd3.Services;
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using apbd3.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace apbd3.Middlewares
 {
@@ -18,39 +15,34 @@ namespace apbd3.Middlewares
             _next = next;
         }
 
-        public async Task InvokeAsync(HttpContext httpContext,IStudentsDbService service)
+        public async Task InvokeAsync(HttpContext httpContext, IStudentsDbService service)
         {
-            string log = "";
+            var log = "";
 
             if (httpContext.Request != null)
             {
-                string path = httpContext.Request.Path;
-                string method = httpContext.Request.Method;
-                string queryString = httpContext.Request.QueryString.ToString();
-                string bodyStr = "";
+                var path = httpContext.Request.Path;
+                var method = httpContext.Request.Method;
+                var queryString = httpContext.Request.QueryString.ToString();
+                var bodyStr = "";
 
 
                 httpContext.Request.EnableBuffering();
-                
-                using (StreamReader reader = new StreamReader(httpContext.Request.Body, Encoding.UTF8, true, 1024, true))
+
+                using (var reader =
+                    new StreamReader(httpContext.Request.Body, Encoding.UTF8, true, 1024, true))
                 {
                     bodyStr = await reader.ReadToEndAsync();
 
                     httpContext.Request.Body.Position = 0;
-                    
                 }
+
                 log = path + " " + method + " " + queryString + " " + bodyStr + "\n";
 
                 service.SaveLogData(log);
-
             }
-            if (_next != null) { 
-                
-                await _next(httpContext);
-                }
+
+            if (_next != null) await _next(httpContext);
         }
-        }
-            
     }
-
-
+}
